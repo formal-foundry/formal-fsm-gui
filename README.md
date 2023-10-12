@@ -1,2 +1,2 @@
-# fsm-agda
+# fsm-agda 
 Finite State Machine - Agda 
