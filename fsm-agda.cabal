@@ -26,6 +26,7 @@ source-repository head
 library
   exposed-modules:
       Lib
+      SmEx
   other-modules:
       Paths_fsm_agda
   autogen-modules:
@@ -34,7 +35,12 @@ library
       src
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
   build-depends:
-      base >=4.7 && <5
+      aeson
+    , base >=4.7 && <5
+    , bytestring
+    , containers
+    , neat-interpolation
+    , string-interpolate
   default-language: Haskell2010
 
 executable fsm-agda-exe
@@ -47,8 +53,13 @@ executable fsm-agda-exe
       app
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      aeson
+    , base >=4.7 && <5
+    , bytestring
+    , containers
     , fsm-agda
+    , neat-interpolation
+    , string-interpolate
   default-language: Haskell2010
 
 test-suite fsm-agda-test
@@ -62,6 +73,11 @@ test-suite fsm-agda-test
       test
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      aeson
+    , base >=4.7 && <5
+    , bytestring
+    , containers
     , fsm-agda
+    , neat-interpolation
+    , string-interpolate
   default-language: Haskell2010
