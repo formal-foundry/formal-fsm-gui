@@ -26,6 +26,7 @@ dependencies:
 - string-interpolate
 - neat-interpolation
 - containers
+- text
 
 ghc-options:
 - -Wall
