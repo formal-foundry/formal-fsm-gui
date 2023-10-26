@@ -1,3 +1,5 @@
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE QuasiQuotes #-}
 {-# OPTIONS_GHC -w #-}
@@ -66,6 +68,52 @@ ex1  = [i| {
 }
 |]
 
+-- data Transition s  = Transition {target :: s  }
+
+-- data State s t =  State { transitions :: Map t (Transition s)
+--                          }
+-- data FSM s t = FSM { states :: Map s (State s t)
+--                    , name :: String
+--                    , initial :: State s t 
+--                    }
+
+
+w :: forall s t. FSM Key t 
+w = let v = gen ex1
+        sList = case v of
+                  Object states -> AK.toMap states in
+      -- FSM M.empty
+      FSM $ M.mapWithKey  mapF sList
+
+
+mapF :: s ->  Value   -> State s t
+mapF key val =  case val of
+  Object q -> let x = AK.lookup (K.fromString "on") q
+    in
+    case x of
+     Just r -> case r of
+       Object rr -> State $  M.mapWithKey mapFT (AK.toMap rr)
+     Nothing  -> State M.empty
+  _ -> State M.empty
+
+
+
+mapFT :: t -> Value -> Transition s 
+mapFT t v = undefined
+
+-- mapFT :: t -> Value -> Transition s 
+-- mapFT k v = undefined
+
+-- mapF ::  Key -> Value -> Value
+-- mapF k v  = let nV = case of
+--                   Object x -> AK.toMap states
+--                   _ -> M.empty in
+--   undefined
+
+
+
+
+
 x :: Value -> String
 x val=  case val of
     Object z -> case AK.lookup (K.fromString "id") z of
@@ -85,43 +133,35 @@ convertInternal old =
         states = case AK.lookup (K.fromString "states") o of
           Nothing -> String "Bad Val"
           Just stat -> case stat of
-                         Object s -> let z = AK.map id s
-                                     in Object z
-                         _ -> String "Bad Val"
+            Object x -> Object $ AK.mapWithKey (\k a -> a) x 
+            _ -> String "Bad Val"
       in
        String "Bad Val"
     _ -> String "f"  
 
 
-genFSM :: ByteString -> Maybe (FSM s t)
-genFSM j =
+-- genFSM :: ByteString -> Maybe (FSM s t)
+-- genFSM j =
+--   case decode j :: Maybe Value of
+--     Nothing -> Nothing
+--     Just v -> 
+--            let nv = convertInternal v
+--                name =  x v
+--                states = "f"
+--                newJ = convertInternal v
+--             in
+--              Just  FSM {states = M.empty
+--                  , name = name
+--                  , initial = State {transitions = M.empty}
+
+--                  }
+
+
+gen :: ByteString -> Value
+gen j =
   case decode j :: Maybe Value of
-    Nothing -> Nothing
-    Just v -> 
-           let nv = convertInternal v
-               name =  x v
-               states = "f"
-               newJ = convertInternal v
-            in
-             Just  FSM {states = M.empty
-                 , name = name
-                 , initial = State {transitions = M.empty}
-
-                 }
-
-
--- data Transition s  = Transition {target :: s  }
-
-
-
-
--- d ata State s t =  State { transitions :: Map t (Transition s)
---                          }
-
--- data FSM s t = FSM { states :: Map s (State s t)
---                    , name :: String
---                    , initial :: State s t 
---                    }
+    Nothing -> Null
+    Just v -> v
 
 
 
