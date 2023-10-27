@@ -78,90 +78,96 @@ ex1  = [i| {
 --                    }
 
 
-w :: forall s t. FSM Key t 
-w = let v = gen ex1
-        sList = case v of
-                  Object states -> AK.toMap states in
-      -- FSM M.empty
-      FSM $ M.mapWithKey  mapF sList
+createFSM :: ByteString -> FSM String String
+createFSM json = case  decode  json :: Maybe Value of
+  Nothing -> FSM M.empty
+  Just val -> case val of
+    Object o -> case AK.lookup (K.fromString "states") o of
+          Nothing -> FSM M.empty
+          Just s -> case s of
+            Object x -> FSM $ M.map createState (toStringFromKM x)
+            _ -> FSM M.empty
+     
+    _ -> FSM M.empty
 
 
-mapF :: s ->  Value   -> State s t
-mapF key val =  case val of
-  Object q -> let x = AK.lookup (K.fromString "on") q
-    in
-    case x of
-     Just r -> case r of
-       Object rr -> State $  M.mapWithKey mapFT (AK.toMap rr)
+toStringFromKM :: KeyMap Value -> Map String Value
+toStringFromKM km = M.mapKeys (\x -> K.toString x) (AK.toMap km)
+ 
+
+createState :: Value -> State String String
+createState v = case v of
+  Object o ->  case AK.lookup (K.fromString "on") o of
+     Just on -> case on of
+       Object s -> State $ M.mapWithKey createTransition(toStringFromKM s)
      Nothing  -> State M.empty
   _ -> State M.empty
 
+createTransition ::  String -> Value -> Transition String
+createTransition k v = case v of
+  Object vv -> 
+    case (AK.!?) vv (K.fromString "target") of
+      Nothing -> Transition k
+      Just x -> case x of
+        String txt -> Transition $ T.unpack txt
+        _ -> Transition k
+  _ -> Transition "f"
 
 
-mapFT :: t -> Value -> Transition s 
-mapFT t v = undefined
+----------TESTSc------------
+test :: Int
+test  = M.size $ states $ createFSM ex1
 
--- mapFT :: t -> Value -> Transition s 
--- mapFT k v = undefined
+-- test2 :: int
+-- test2 = case  decode  json :: maybe value of
+--   nothing -> m.size fsm m.empty
+--   just val -> case val of
+--     object o ->
+--       let 
+--         states = case ak.lookup (k.fromstring "states") o of
+--           nothing -> m.size fsm m.empty
+--           just s -> case s of
+--             object x -> m.size fsm $ m.map createstate (tostringfromkm x)
 
--- mapF ::  Key -> Value -> Value
--- mapF k v  = let nV = case of
---                   Object x -> AK.toMap states
---                   _ -> M.empty in
---   undefined
-
-
-
-
-
-x :: Value -> String
-x val=  case val of
-    Object z -> case AK.lookup (K.fromString "id") z of
-      Just e -> case e of
-        String s -> T.unpack s
-        _ -> "empty_schema_name"
-    _ ->  "empty_schema_name"
-
-getStates :: ByteString -> Value
-getStates j = undefined 
-
-convertInternal :: Value -> Value
-convertInternal old =
-  case old of
-    Object o ->
-      let 
-        states = case AK.lookup (K.fromString "states") o of
-          Nothing -> String "Bad Val"
-          Just stat -> case stat of
-            Object x -> Object $ AK.mapWithKey (\k a -> a) x 
-            _ -> String "Bad Val"
-      in
-       String "Bad Val"
-    _ -> String "f"  
+--     _ -> 0
 
 
--- genFSM :: ByteString -> Maybe (FSM s t)
--- genFSM j =
+            
+------------------------------------
+-- createFSM :: ByteString -> FSM s t
+-- createFSM json = case genValue json of
+--     Object o ->
+--       let 
+--         states = case AK.lookup (K.fromString "states") o of
+--           Nothing -> FSM M.empty
+--           Just s -> case s of
+--             Object x -> FSM $ M.map createState (toStringFromKM x)
+--             _ -> FSM M.empty
+--       in 
+--        FSM M.empty
+--     _ -> FSM M.empty
+
+
+-- toStringFromKM :: KeyMap Value -> Map String Value
+-- toStringFromKM km = M.mapKeys (\x -> K.toString x) (AK.toMap km)
+ 
+
+-- createState :: Value -> State s t
+-- createState v = case v of
+--   Object o ->  case AK.lookup (K.fromString "on") o of
+--      Just on -> case on of
+--        Object s -> State M.empty
+--      Nothing  -> State M.empty
+--   _ -> State M.empty
+
+-- createTransition :: forall s. Value -> Transition s
+-- createTransition v = Transition {target = "State 3"}
+
+
+-- genValue :: ByteString -> Value
+-- genValue j =
 --   case decode j :: Maybe Value of
---     Nothing -> Nothing
---     Just v -> 
---            let nv = convertInternal v
---                name =  x v
---                states = "f"
---                newJ = convertInternal v
---             in
---              Just  FSM {states = M.empty
---                  , name = name
---                  , initial = State {transitions = M.empty}
-
---                  }
-
-
-gen :: ByteString -> Value
-gen j =
-  case decode j :: Maybe Value of
-    Nothing -> Null
-    Just v -> v
-
+--     Nothing -> Null
+--     Just v -> v
 
 
