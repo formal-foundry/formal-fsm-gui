@@ -40,6 +40,7 @@ library
     , base >=4.7 && <5
     , bytestring
     , containers
+    , directory
     , neat-interpolation
     , string-interpolate
     , text
@@ -59,6 +60,7 @@ executable fsm-agda-exe
     , base >=4.7 && <5
     , bytestring
     , containers
+    , directory
     , fsm-agda
     , neat-interpolation
     , string-interpolate
@@ -80,6 +82,7 @@ test-suite fsm-agda-test
     , base >=4.7 && <5
     , bytestring
     , containers
+    , directory
     , fsm-agda
     , neat-interpolation
     , string-interpolate

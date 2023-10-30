@@ -17,6 +17,9 @@ import Data.Text as T
 import Data.String
 import Data.List as L
 import Data.Char as C
+
+import System.Directory
+
 import Types
 
 
@@ -70,21 +73,49 @@ ex1  = [i| {
 |]
 
 
-createA :: IO ()
-createA = do
+createAgda :: IO ()
+createAgda = do
   let fsm  = createFSM ex1
-      stateL = L.reverse $ L.map sc $ M.keys $ states fsm
-  putStrLn $ "module Problem where\n\n"
-    ++ "data State : Set where\n"
-    ++ "  " ++ L.foldl1 (\x a->  a ++ " " ++ x  ) stateL ++ " : State\n\n"
-    ++"data Input : Set where\n" 
+      stateL = L.map createConst $ M.keys $ states fsm
+      inputL = foldInput (M.elems (states fsm))
+      agda =  "module Problem where\n\n"
+        ++ "data State : Set where\n"
+        ++ "  " ++ L.foldl1 (\x a->  x ++ " " ++ a  ) stateL ++ " : State\n\n"
+        ++"data Input : Set where\n"
+        ++ "  " ++ L.foldl1 (\x a->  x ++ " " ++ a  ) inputL ++ " : Input\n\n"
+  saveAgda agda 
 
-sc :: [Char] -> String
-sc (s:xs) = case C.isDigit s of
+saveAgda :: String -> IO ()
+saveAgda agda = do
+  homeDir <- getHomeDirectory
+  let file = homeDir ++ "/agdaCompilation/Problem.agda"
+  putStrLn file
+  Prelude.writeFile file agda 
+  return ()
+
+
+
+createConst :: [Char] -> String
+createConst (s:xs) = case C.isDigit s of
   False -> case C.isLower s of
     True -> L.filter (not . isSpace) (s:xs)
     False -> L.filter (not . isSpace)((C.toLower s):xs)
   True -> L.filter (not . isSpace) (s:xs)
+
+foldInput ::  [State String String] -> [String]
+foldInput ls = L.map createConst
+  $ L.foldl (\x a -> x ++ (M.keys $ transitions a)) [] ls
+
+-- data Transition s  = Transition {target :: s  }
+
+-- data State s t =  State { transitions :: Map t (Transition s)
+--                         }
+                  
+-- data FSM s t = FSM { states :: Map s (State s t)
+--                    }
+
+
+
 
 
 createFSM :: ByteString -> FSM String String

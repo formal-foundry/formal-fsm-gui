@@ -27,6 +27,7 @@ dependencies:
 - neat-interpolation
 - containers
 - text
+- directory
 
 ghc-options:
 - -Wall
