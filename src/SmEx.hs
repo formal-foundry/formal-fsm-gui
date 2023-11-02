@@ -76,34 +76,36 @@ ex1  = [i| {
 createAgda :: IO ()
 createAgda = do
   let fsm  = createFSM ex1
-      stateL = L.map createConst $ M.keys $ states fsm
+      stateL = L.map cC $ M.keys $ states fsm
       inputL = foldInput (M.elems (states fsm))
-      agda =  "module Problem where\n\n"
+      start =  "module Problem where\n\n"
+        ++ "open import Agda.Builtin.Maybe\n\n"
         ++ "data State : Set where\n"
         ++ "  " ++ L.foldl1 (\x a->  x ++ " " ++ a  ) stateL ++ " : State\n\n"
         ++"data Input : Set where\n"
         ++ "  " ++ L.foldl1 (\x a->  x ++ " " ++ a  ) inputL ++ " : Input\n\n"
-  saveAgda agda 
+  update <- createUpdateF fsm
+  putStrLn $ start ++ update
+  saveAgda $ start ++ update
 
 saveAgda :: String -> IO ()
 saveAgda agda = do
   homeDir <- getHomeDirectory
   let file = homeDir ++ "/agdaCompilation/Problem.agda"
-  putStrLn file
+  -- putStrLn file
   Prelude.writeFile file agda 
   return ()
 
 
-
-createConst :: [Char] -> String
-createConst (s:xs) = case C.isDigit s of
+cC :: [Char] -> String
+cC (s:xs) = case C.isDigit s of
   False -> case C.isLower s of
     True -> L.filter (not . isSpace) (s:xs)
     False -> L.filter (not . isSpace)((C.toLower s):xs)
   True -> L.filter (not . isSpace) (s:xs)
 
 foldInput ::  [State String String] -> [String]
-foldInput ls = L.map createConst
+foldInput ls = L.map cC
   $ L.foldl (\x a -> x ++ (M.keys $ transitions a)) [] ls
 
 -- data Transition s  = Transition {target :: s  }
@@ -113,6 +115,21 @@ foldInput ls = L.map createConst
                   
 -- data FSM s t = FSM { states :: Map s (State s t)
 --                    }
+
+
+createUpdateF :: FSM String String -> IO String
+createUpdateF fsm = do
+  let
+    sig = "update : State → Input → Maybe State\n"
+    maped =
+       M.elems( M.mapWithKey (\sk sv ->
+        (M.elems(M.mapWithKey ((\stateK tk tv ->
+        "update " ++cC stateK ++ " " ++ cC tk ++ " = just " ++ cC (target tv) ++ "\n"
+                     ) sk) (transitions sv)) ++
+          [("update " ++ cC sk ++  " _ = nothing\n")])
+                     ) (states fsm))
+
+  return $ sig ++ L.concat (L.concat maped)
 
 
 
@@ -125,36 +142,36 @@ createFSM json = case  decode  json :: Maybe Value of
     Object o -> case AK.lookup (K.fromString "states") o of
           Nothing -> FSM M.empty
           Just s -> case s of
-            Object x -> FSM $ M.map createState (toStringFromKM x)
+            Object x -> FSM $ M.mapWithKey createState (toStringFromKM x)
             _ -> FSM M.empty
-     
+
     _ -> FSM M.empty
 
 
 toStringFromKM :: KeyMap Value -> Map String Value
 toStringFromKM km = M.mapKeys (\x -> K.toString x) (AK.toMap km)
- 
 
-createState :: Value -> State String String
-createState v = case v of
+
+createState :: String ->  Value -> State String String
+createState k v = case v of
   Object o ->  case AK.lookup (K.fromString "on") o of
      Just on -> case on of
-       Object s -> State $ M.mapWithKey createTransition(toStringFromKM s)
+       Object s -> State $ M.mapWithKey (createTransition k)(toStringFromKM s)
      Nothing  -> State M.empty
   _ -> State M.empty
 
-createTransition ::  String -> Value -> Transition String
-createTransition k v = case v of
+createTransition ::  String -> String -> Value -> Transition String
+createTransition sk k v = case v of
   Object vv -> 
     case (AK.!?) vv (K.fromString "target") of
-      Nothing -> Transition k
+      Nothing -> Transition sk
       Just x -> case x of
         String txt -> Transition $ T.unpack txt
         _ -> Transition k
   _ -> Transition "f"
 
 
-----------TESTSc------------
+----------TESTS------------
 test :: Int
 test  = M.size $ states $ createFSM ex1
 
