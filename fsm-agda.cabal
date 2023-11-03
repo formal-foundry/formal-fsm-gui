@@ -41,9 +41,14 @@ library
     , bytestring
     , containers
     , directory
+    , http-types
     , neat-interpolation
+    , scotty
     , string-interpolate
     , text
+    , wai
+    , wai-extra
+    , wai-middleware-static
   default-language: Haskell2010
 
 executable fsm-agda-exe
@@ -62,9 +67,14 @@ executable fsm-agda-exe
     , containers
     , directory
     , fsm-agda
+    , http-types
     , neat-interpolation
+    , scotty
     , string-interpolate
     , text
+    , wai
+    , wai-extra
+    , wai-middleware-static
   default-language: Haskell2010
 
 test-suite fsm-agda-test
@@ -84,7 +94,12 @@ test-suite fsm-agda-test
     , containers
     , directory
     , fsm-agda
+    , http-types
     , neat-interpolation
+    , scotty
     , string-interpolate
     , text
+    , wai
+    , wai-extra
+    , wai-middleware-static
   default-language: Haskell2010

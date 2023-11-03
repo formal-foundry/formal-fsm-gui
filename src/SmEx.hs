@@ -73,20 +73,20 @@ ex1  = [i| {
 |]
 
 
-createAgda :: IO ()
-createAgda = do
-  let fsm  = createFSM ex1
+createAgda :: ByteString ->  IO String
+createAgda bs = do
+  let fsm  = createFSM bs
       stateL = L.map cC $ M.keys $ states fsm
       inputL = foldInput (M.elems (states fsm))
-      start =  "module Problem where\n\n"
-        ++ "open import Agda.Builtin.Maybe\n\n"
+      start = "open import Agda.Builtin.Maybe\n\n"
         ++ "data State : Set where\n"
         ++ "  " ++ L.foldl1 (\x a->  x ++ " " ++ a  ) stateL ++ " : State\n\n"
         ++"data Input : Set where\n"
         ++ "  " ++ L.foldl1 (\x a->  x ++ " " ++ a  ) inputL ++ " : Input\n\n"
   update <- createUpdateF fsm
-  putStrLn $ start ++ update
   saveAgda $ start ++ update
+  return $ start ++ update
+  
 
 saveAgda :: String -> IO ()
 saveAgda agda = do
