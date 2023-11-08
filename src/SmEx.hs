@@ -253,7 +253,7 @@ createInputPi fsm =
   let maped =
        M.elems( M.mapWithKey (\sk sv ->
         (M.elems(M.mapWithKey ((\stateK tk tv ->
-        "  " ++ tk ++ " : Input " ++ stateK ++ "\n"
+        "  " ++ cC tk ++ " : Input " ++ cC stateK ++ "\n"
         ) sk) (transitions sv))) ) (states fsm))
 
   in L.concat . L.concat $ maped
@@ -263,7 +263,7 @@ createUpdatePi fsm =
   let maped =
        M.elems( M.mapWithKey (\sk sv ->
         (M.elems(M.mapWithKey ((\stateK tk tv ->
-        "update " ++ stateK  ++" "++ tk ++ " = " ++ (target tv)++ "\n"
+        "update " ++ cC stateK  ++" "++ cC tk ++ " = " ++ cC (target tv)++ "\n"
         ) sk) (transitions sv))) ) (states fsm))
 
   in L.concat . L.concat $ maped

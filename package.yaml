@@ -33,6 +33,7 @@ dependencies:
 - wai-extra
 - wai-middleware-static
 - http-types
+- base64-bytestring
 
 
 ghc-options:

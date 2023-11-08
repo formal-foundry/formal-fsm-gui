@@ -27,6 +27,7 @@ import Control.Monad.IO.Class (liftIO)
 
 import Data.Text as T
 import Data.Text.Lazy as TL
+import Data.Text.Lazy.Encoding    as TL
 
 import Network.HTTP.Types.Status
 
@@ -34,6 +35,7 @@ import Web.Scotty
 import qualified Network.Wai.Parse as NWP
 import System.Environment
 import Data.Aeson
+import Data.ByteString.Base64.Lazy as B64
 
 mainAPI :: FSMEnv -> IO ()
 mainAPI env =do 
@@ -42,10 +44,15 @@ mainAPI env =do
     get "/help" $  text  $ TL.fromStrict infoWeb
 
 
-    post "/jsonSchema" $ do
-      body  <- body
-      agda <-liftIO $ createAndCompileAgda body
-      -- text  $ TL.pack $ info js
+    post "/update" $ do
+      body  <- jsonData :: ActionM ReqJson
+      let bs = case B64.decode  ( (TL.encodeUtf8 . TL.pack ) (schema body)) of
+            Right x  -> x
+            _ -> "empty"
+            
+               
+      liftIO $ Prelude.putStrLn $ (TL.unpack . TL.decodeUtf8 ) bs
+      agda <-liftIO $ createAndCompileAgda bs
       text $ TL.pack agda
 
 

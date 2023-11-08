@@ -38,6 +38,7 @@ library
   build-depends:
       aeson
     , base >=4.7 && <5
+    , base64-bytestring
     , bytestring
     , containers
     , directory
@@ -63,6 +64,7 @@ executable fsm-agda-exe
   build-depends:
       aeson
     , base >=4.7 && <5
+    , base64-bytestring
     , bytestring
     , containers
     , directory
@@ -90,6 +92,7 @@ test-suite fsm-agda-test
   build-depends:
       aeson
     , base >=4.7 && <5
+    , base64-bytestring
     , bytestring
     , containers
     , directory
