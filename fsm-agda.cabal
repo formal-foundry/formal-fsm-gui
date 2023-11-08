@@ -42,6 +42,8 @@ library
     , bytestring
     , containers
     , directory
+    , http-client
+    , http-client-tls
     , http-types
     , neat-interpolation
     , scotty
@@ -69,6 +71,8 @@ executable fsm-agda-exe
     , containers
     , directory
     , fsm-agda
+    , http-client
+    , http-client-tls
     , http-types
     , neat-interpolation
     , scotty
@@ -97,6 +101,8 @@ test-suite fsm-agda-test
     , containers
     , directory
     , fsm-agda
+    , http-client
+    , http-client-tls
     , http-types
     , neat-interpolation
     , scotty

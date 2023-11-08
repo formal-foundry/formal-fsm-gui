@@ -34,7 +34,9 @@ dependencies:
 - wai-middleware-static
 - http-types
 - base64-bytestring
-
+- http-client
+- http-client-tls
+- http-types
 
 ghc-options:
 - -Wall

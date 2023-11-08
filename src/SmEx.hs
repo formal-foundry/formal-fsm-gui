@@ -24,6 +24,13 @@ import Data.Text.Lazy             as TL
 import Data.Text.Lazy.Encoding    as TL
 import Data.Text.Lazy.IO          as TL
 
+import Network.HTTP.Client
+import Network.HTTP.Client.TLS (tlsManagerSettings)
+import Network.HTTP.Types.Status
+import Network.HTTP.Client.MultipartFormData
+
+import Control.Concurrent
+
 import System.Directory
 
 import Types
@@ -167,15 +174,17 @@ createAndCompileAgda bs = do
   fsm  <- createFSM $ bs
   agda <- piAgda fsm
   saveAgda $ agda
-  return agda
+  resAgda <- compileProblem
+  return resAgda
 
+-- testing function
 c :: ByteString ->  IO ()
 c bs = do
   fsm  <- createFSM $ bs
   agda <- piAgda fsm
   Prelude.putStrLn agda
   return ()
-
+-- 
 
 saveAgda :: String -> IO ()
 saveAgda agda = do
@@ -267,6 +276,38 @@ createUpdatePi fsm =
         ) sk) (transitions sv))) ) (states fsm))
 
   in L.concat . L.concat $ maped
+
+
+
+-- compilation
+
+compileProblem :: IO String
+compileProblem = do
+  let
+    url = "http://localhost:3030/agda"
+    agda = "/home/kryn/agdaCompilation/Problem.agda"
+    meta = "/home/kryn/agdaCompilation/Problem.json"
+  manager <- newManager defaultManagerSettings
+  initialRequest <- parseRequest url
+  let request = initialRequest { method = "POST"}
+                               -- , requestHeaders = [ ("Content-Type", "multipart/form-data")]}
+      partList = [ partFile "Problem.agda" agda
+                 , partFile "Problem.json" meta
+                 ] 
+  req <- formDataBody partList request 
+  response <- httpLbs req manager
+  res <- dec $ responseBody response
+
+  return res
+
+
+dec :: BSL.ByteString -> IO  String
+dec re = do
+  let r = A.decode re :: Maybe ResponseTC
+  case r of
+    Nothing -> return $  "agda failed"
+    Just x -> return $  (output x)
+
 
 
 ----------TESTS------------

@@ -31,3 +31,9 @@ data FSMEnv = FSMEnv { port :: Int
 data ReqJson = ReqJson {schema :: String
                     , info :: String
                     } deriving (Show, Generic, ToJSON, FromJSON)
+
+
+data ResponseTC = ResponseTC{ output :: String
+                              , status :: Int} deriving (Show,  Generic, ToJSON, FromJSON)
+
+
