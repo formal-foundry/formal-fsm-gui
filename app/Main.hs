@@ -1,3 +1,6 @@
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE QuasiQuotes #-}
 {-# OPTIONS_GHC -fno-warn-unused-matches #-}
@@ -10,6 +13,11 @@ module Main where
 
 import Types
 import SmEx
+
+
+import GHC.Generics
+import Data.Aeson
+import Data.Aeson.Text
 
 import qualified NeatInterpolation as NI(text)
 
@@ -31,19 +39,19 @@ mainAPI :: FSMEnv -> IO ()
 mainAPI env =do 
   scotty (port env) $ do
 
-    get "/help" $  text  $ TL.fromStrict info
+    get "/help" $  text  $ TL.fromStrict infoWeb
 
 
     post "/jsonSchema" $ do
-      js  <- body
-      agda <-liftIO $ createAgda js
-      -- text  $ TL.pack $ show agda
+      body  <- body
+      agda <-liftIO $ createAndCompileAgda body
+      -- text  $ TL.pack $ info js
       text $ TL.pack agda
-
 
 
 main :: IO ()
 main = loadConfigAndRun mainAPI
+
 
 
 loadConfigAndRun :: (FSMEnv  -> IO ()) -> IO ()
@@ -61,8 +69,8 @@ loadConfigAndRun mainAPI =
        Prelude.putStrLn $ show args ++  "\n\nInvalid number of arguments, please run the program again with one argument: config.json"
 
 
-info :: T.Text
-info =  [NI.text|
+infoWeb :: T.Text
+infoWeb =  [NI.text|
 EXAMPLE OF USAGE
 text 
 or HTML |]

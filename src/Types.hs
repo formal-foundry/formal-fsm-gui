@@ -8,7 +8,7 @@ module Types where
 import GHC.Generics
 import Data.Aeson
 import Data.Aeson.Text
-
+import Data.ByteString.Lazy as BSL
 
 import Data.Text as T
 import Data.Text.Lazy as TL
@@ -22,7 +22,12 @@ data State s t =  State { transitions :: Map t (Transition s)
                         }
 
 data FSM s t = FSM { states :: Map s (State s t)
-                   }
+                   } 
 
 data FSMEnv = FSMEnv { port :: Int
                      } deriving (Show, Generic, ToJSON, FromJSON)
+
+
+data ReqJson = ReqJson {schema :: String
+                    , info :: String
+                    } deriving (Show, Generic, ToJSON, FromJSON)
