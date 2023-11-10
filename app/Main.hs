@@ -29,8 +29,9 @@ import Data.Text.Lazy as TL
 import Data.Text.Lazy.Encoding    as TL
 
 import Network.HTTP.Types.Status
-
+import Network.Wai.Parse
 import Web.Scotty
+import Network.Wai.Middleware.Static
 
 import Network.Wai
 import Network.Wai.Middleware.Cors
@@ -61,6 +62,7 @@ mainAPI env =do
     middleware addFrameHeader
     middleware addFrameHeaderA
     middleware addFrameHeaderC
+    middleware $ staticPolicy (noDots >-> addBase "../fsm-web")
 
     options (regex "/*")  $ text "Success"
 
