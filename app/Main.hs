@@ -24,22 +24,45 @@ import qualified NeatInterpolation as NI(text)
 import Data.Text.Lazy
 import Control.Monad.IO.Class (liftIO)
 
-
 import Data.Text as T
 import Data.Text.Lazy as TL
 import Data.Text.Lazy.Encoding    as TL
 
 import Network.HTTP.Types.Status
 
-import Web.Scotty 
+import Web.Scotty
+
+import Network.Wai
+import Network.Wai.Middleware.Cors
+
 import qualified Network.Wai.Parse as NWP
 import System.Environment
 import Data.Aeson
 import Data.ByteString.Base64.Lazy as B64
 
+addFrameHeader :: Middleware
+addFrameHeader =
+  modifyResponse (mapResponseHeaders (("Access-Control-Allow-Origin", "*") :))
+
+addFrameHeaderA :: Middleware
+addFrameHeaderA =
+ (modifyResponse (mapResponseHeaders (("Access-Control-Allow-Methods", "*") :)))
+
+
+addFrameHeaderC :: Middleware
+addFrameHeaderC =
+  modifyResponse (mapResponseHeaders (("Access-Control-Allow-Headers", "*") :))
+
+
+ 
 mainAPI :: FSMEnv -> IO ()
 mainAPI env =do 
   scotty (port env) $ do
+    middleware addFrameHeader
+    middleware addFrameHeaderA
+    middleware addFrameHeaderC
+
+    options (regex "/*")  $ text "Success"
 
     get "/help" $  text  $ TL.fromStrict infoWeb
 
@@ -50,7 +73,7 @@ mainAPI env =do
             Right x  -> x
             _ -> "empty"
             
-               
+         
       liftIO $ Prelude.putStrLn $ (TL.unpack . TL.decodeUtf8 ) bs
       agda <-liftIO $ createAndCompileAgda bs
       text $ TL.pack agda
