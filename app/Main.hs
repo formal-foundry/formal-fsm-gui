@@ -69,15 +69,27 @@ mainAPI env =do
     get "/help" $  text  $ TL.fromStrict infoWeb
 
 
-    post "/update" $ do
+    -- post "/update" $ do
+    --   body  <- jsonData :: ActionM ReqJson
+    --   let bs = case B64.decode  ( (TL.encodeUtf8 . TL.pack ) (schema body)) of
+    --         Right x  -> x
+    --         _ -> "empty"
+
+    --   liftIO $ Prelude.putStrLn $ (TL.unpack . TL.decodeUtf8 ) bs
+    --   agda <-liftIO $ createAndCompileAgda bs
+    --   text $ TL.pack agda
+
+    options "/getAgda" $ text "Success"
+    post "/getAgda" $ do
       body  <- jsonData :: ActionM ReqJson
       let bs = case B64.decode  ( (TL.encodeUtf8 . TL.pack ) (schema body)) of
             Right x  -> x
             _ -> "empty"
-            
-         
-      liftIO $ Prelude.putStrLn $ (TL.unpack . TL.decodeUtf8 ) bs
-      agda <-liftIO $ createAndCompileAgda bs
+          mo = case (mode body) of
+               "pi" -> Pi
+               _ -> Mb
+
+      agda <-liftIO $ createAgdaFromBS bs mo
       text $ TL.pack agda
 
 

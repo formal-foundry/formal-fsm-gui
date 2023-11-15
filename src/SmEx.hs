@@ -168,9 +168,16 @@ createTransitionFSM sk k v = case v of
 toStringFromKM :: KeyMap Value -> Map String Value
 toStringFromKM km = M.mapKeys (\x -> K.toString x) (AK.toMap km)
 
+createAgdaFromBS :: ByteString -> Mode ->  IO String
+createAgdaFromBS  bs mode  = do
+  fsm  <- createFSM $ bs
+  agda <- case mode of
+            Pi -> piAgda fsm
+            Mb -> maybeAgda fsm
+  return agda
 
-createAndCompileAgda :: ByteString ->  IO String
-createAndCompileAgda bs = do
+createAndCompileAgda :: ByteString -> Mode ->  IO String
+createAndCompileAgda bs mode= do
   fsm  <- createFSM $ bs
   agda <- piAgda fsm
   saveAgda $ agda
