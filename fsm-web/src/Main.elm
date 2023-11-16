@@ -32,7 +32,8 @@ type alias Input = { jsonSchema  : String,
                      setting : Setting
                    }
 
-type alias Setting = {someSet : Maybe String}
+type alias Setting = {codeMode :  String,
+                      turns :  Int     }
 
 
 type Msg = Restart
@@ -40,6 +41,8 @@ type Msg = Restart
          | UpdateAgda Input
          | UpdateP1 Input
          | UpdateP2 Input
+         | UpdateAM Input
+         | UpdateT Input
          | ChangeBookMark MenuButton
          | GenAgda
          | CheckAgda
@@ -57,7 +60,8 @@ initInput = { jsonSchema = ex,
 
 
 initSet : Setting
-initSet = {someSet = Nothing}
+initSet = {codeMode = "pi",
+           turns = 10  }
 
 init : () -> ( Model, Cmd Msg )
 init _ =
@@ -69,13 +73,17 @@ update msg model =
       Restart -> (Init initInput BSchema, reload)
       UpdateSchema i -> (updateS i model, Cmd.none)
       UpdateAgda i -> (updateA i model, Cmd.none)
-      UpdateP1 i -> (updateP1 i model, Cmd.none)
-      UpdateP2 i -> (updateP1 i model, Cmd.none)
+      UpdateP1 i -> (updateDef i model, Cmd.none)
+      UpdateP2 i -> (updateDef i model, Cmd.none)
+      UpdateAM i -> (updateDef i model, Cmd.none)
+      UpdateT i ->  (updateDef i model, Cmd.none)
       ChangeBookMark b -> (buttonChanger b model, Cmd.none)
       GenAgda  -> (model, getAgda model)
       CheckAgda -> (Init initInput BSchema, Cmd.none)
       Generator m res -> (afterGen m res, Cmd.none)
       Checker _ -> ( Init initInput BSchema, Cmd.none)
+
+
 
 afterGen : Model -> (Result Http.Error String) -> Model
 afterGen m r =
@@ -85,21 +93,14 @@ afterGen m r =
     WaitingForAgdaFile ei b  -> WaitingForAgdaCheck {ei| agdaValue = newA} b 
     _ -> Init initInput BSchema
 
-updateP1 : Input -> Model -> Model
-updateP1 i m =
+updateDef : Input -> Model -> Model
+updateDef i m =
  case m of
      Init ei b -> Init i b
      WaitingForAgdaFile ei b -> WaitingForAgdaFile ei b
-     WaitingForAgdaCheck ei b -> WaitingForAgdaFile i b
-     DisplayResults ei b -> WaitingForAgdaFile i b
+     WaitingForAgdaCheck ei b -> WaitingForAgdaCheck i b
+     DisplayResults ei b -> DisplayResults i b
 
-updateP2 : Input -> Model -> Model
-updateP2 i m =
- case m of
-     Init ei b -> Init i b
-     WaitingForAgdaFile ei b -> WaitingForAgdaFile ei b
-     WaitingForAgdaCheck ei b -> WaitingForAgdaFile i b
-     DisplayResults ei b -> WaitingForAgdaFile i b
 
 
 updateS : Input -> Model -> Model
@@ -330,15 +331,49 @@ p2Div m =
                                            [text s]]]
 
 
+
 updatep2 : Model -> String -> Msg
 updatep2 m s = case m of
   WaitingForAgdaCheck i _  -> UpdateAgda {i | prompt2 = s}
   DisplayResults i _ -> UpdateAgda {i | prompt2 = s}
   _ -> Restart
 
-
 setDiv : Model -> Html Msg
-setDiv m = div [style "height" "350px"][text "set"]
+setDiv m = div [style "height" "350px"][ agdaSetDiv m, checkerSetDiv m ]
+
+agdaSetDiv : Model -> Html Msg
+agdaSetDiv m =
+    let t = case m of
+            Init i _ -> .codeMode (.setting i)
+            WaitingForAgdaFile i _ -> .codeMode (.setting i)
+            WaitingForAgdaCheck i _  -> .codeMode (.setting i)
+            DisplayResults i _ -> .codeMode (.setting i)
+  in
+  div [style "text-align" "center",
+                    style "font-size" "large",
+                    style "border-bottom" "double"]
+                   [p [style "font-size" "large"][text "agda set"],
+                    p [style "text-align" "left", style "font-size" "large" ]
+                      [text "Choise Agda file output (type : pi , mb)",
+                       div [][Html.input [type_ "text", value t, onInput (updateAC m)][]]
+                         
+                    ]]
+
+updateAC : Model -> String -> Msg
+updateAC m s = case m of
+  Init i _ -> UpdateAM { i | setting = {setting.setting | codeMode = s  }}
+  WaitingForAgdaFile i _ -> Restart
+  WaitingForAgdaCheck i _ -> Restart
+  DisplayResults i _ -> Restart
+-- UpdateAgda {i | prompt2 = s} codeMode
+
+checkerSetDiv : Model -> Html Msg
+checkerSetDiv m = div [style "text-align" "center",
+                       style "font-size" "large",
+                       style "border-bottom" "double"]
+                      [text "checker set ",
+                       div [][Html.input [type_ "radio", value"fr"][text "f"]]]
+
 
 
 butChoise : MenuButton -> Model -> Html Msg
@@ -354,7 +389,7 @@ divO m =
   let res = case m of
                Init _ _ -> "Waiting for Agda Checker"
                WaitingForAgdaFile i _ -> .agdaValue i
-               WaitingForAgdaCheck i _ -> (.agdaValue i) ++ "dedewferfe" 
+               WaitingForAgdaCheck i _ -> (.agdaValue i) 
                DisplayResults i _ -> getRes i
   in
        div [ style "width" "50%", style "border" "double"]
@@ -415,7 +450,7 @@ getAgda m =
             WaitingForAgdaFile i _ -> .jsonSchema i
             _ -> "pi"
       mo = case m of
-            WaitingForAgdaFile i _ ->  "pi" 
+            WaitingForAgdaFile i _ ->  .codeMode (.setting i)
             _ -> "pi"
   in 
         Http.post
