@@ -29,11 +29,13 @@ type alias Input = { jsonSchema  : String,
                      prompt1 :  String,
                      prompt2 :  String,
                      checkerRes : Maybe String,
-                     setting : Setting
+                     setting : ValS
                    }
 
-type alias Setting = {codeMode :  String,
-                      turns :  Int     }
+type alias ValS = {codeMode :  String,
+                      turns :  String,
+                      gpt : String
+                  }
 
 
 type Msg = Restart
@@ -43,11 +45,12 @@ type Msg = Restart
          | UpdateP2 Input
          | UpdateAM Input
          | UpdateT Input
+         | UpdateG Input
          | ChangeBookMark MenuButton
          | GenAgda
          | CheckAgda
          | Generator Model (Result Http.Error String)
-         | Checker (Result Http.Error String)
+         | Checker Model (Result Http.Error String)
 
 initInput : Input
 initInput = { jsonSchema = ex,
@@ -59,9 +62,10 @@ initInput = { jsonSchema = ex,
 
 
 
-initSet : Setting
+initSet : ValS
 initSet = {codeMode = "pi",
-           turns = 10  }
+           turns = "5",
+           gpt =  "gpt-3.5-turbo" }
 
 init : () -> ( Model, Cmd Msg )
 init _ =
@@ -77,11 +81,12 @@ update msg model =
       UpdateP2 i -> (updateDef i model, Cmd.none)
       UpdateAM i -> (updateDef i model, Cmd.none)
       UpdateT i ->  (updateDef i model, Cmd.none)
+      UpdateG i ->(updateDef i model, Cmd.none)
       ChangeBookMark b -> (buttonChanger b model, Cmd.none)
       GenAgda  -> (model, getAgda model)
       CheckAgda -> (Init initInput BSchema, Cmd.none)
       Generator m res -> (afterGen m res, Cmd.none)
-      Checker _ -> ( Init initInput BSchema, Cmd.none)
+      Checker _ _ -> ( Init initInput BSchema, Cmd.none)
 
 
 
@@ -352,27 +357,72 @@ agdaSetDiv m =
   div [style "text-align" "center",
                     style "font-size" "large",
                     style "border-bottom" "double"]
-                   [p [style "font-size" "large"][text "agda set"],
+                   [p [style "font-size" "large", style "font-weight" "bold"]
+                   [text "agda set"],
                     p [style "text-align" "left", style "font-size" "large" ]
-                      [text "Choise Agda file output (type : pi , mb)",
-                       div [][Html.input [type_ "text", value t, onInput (updateAC m)][]]
-                         
+                      [text "Chose Agda file output (type : pi , mb)",
+                       div [][Html.input [type_ "text", value t, onInput (updateAC m )][]]
+
                     ]]
 
 updateAC : Model -> String -> Msg
 updateAC m s = case m of
-  Init i _ -> UpdateAM { i | setting = {setting.setting | codeMode = s  }}
-  WaitingForAgdaFile i _ -> Restart
-  WaitingForAgdaCheck i _ -> Restart
-  DisplayResults i _ -> Restart
--- UpdateAgda {i | prompt2 = s} codeMode
+  Init i _ ->  UpdateAM ((setSet <| setVmode s) i )
+  WaitingForAgdaFile i _ ->  UpdateAM ((setSet <| setVmode s) i )
+  WaitingForAgdaCheck i _ ->  UpdateAM ((setSet <| setVmode s) i )
+  DisplayResults i _ -> UpdateAM ((setSet <| setVmode s) i )
+   -- Init i _ -> UpdateAM { i | setting = (setVmode s (.setting i)) }
+
+setSet : (ValS -> ValS)-> Input -> Input
+setSet fn i  = {i | setting = fn i.setting } 
+
+
+setVmode : String -> ValS -> ValS
+setVmode  s v = {v | codeMode = s}
+
+setVturns : String -> ValS -> ValS
+setVturns  i v = {v | turns = i}
+
+setVgpt : String -> ValS -> ValS
+setVgpt  s v = {v | gpt = s}
+
+updateG : Model -> String -> Msg
+updateG m s = case m of
+  Init i _ ->  UpdateAM ((setSet <| setVgpt s) i )
+  WaitingForAgdaFile i _ ->  UpdateAM ((setSet <| setVgpt s) i )
+  WaitingForAgdaCheck i _ ->  UpdateAM ((setSet <| setVgpt s) i )
+  DisplayResults i _ -> UpdateAM ((setSet <| setVgpt s) i )
+
+
+updateT : Model -> String -> Msg
+updateT m s  =
+  case m of
+  Init i _ ->  UpdateAM ((setSet <| setVturns s) i )
+  WaitingForAgdaFile i _ ->  UpdateAM ((setSet <| setVturns s) i )
+  WaitingForAgdaCheck i _ ->  UpdateAM ((setSet <| setVturns s) i )
+  DisplayResults i _ -> UpdateAM ((setSet <| setVturns s) i )
 
 checkerSetDiv : Model -> Html Msg
-checkerSetDiv m = div [style "text-align" "center",
-                       style "font-size" "large",
-                       style "border-bottom" "double"]
-                      [text "checker set ",
-                       div [][Html.input [type_ "radio", value"fr"][text "f"]]]
+checkerSetDiv m =
+    let inp = case m of
+            Init i _ -> i
+            WaitingForAgdaFile i _ -> i
+            WaitingForAgdaCheck i _  -> i
+            DisplayResults i _ -> i
+        k = .gpt (.setting inp)
+        it = .turns (.setting inp)
+  in
+  div [style "text-align" "center",
+                    style "font-size" "large",
+                    style "border-bottom" "double"]
+                   [p [style "font-size" "large", style "font-weight" "bold"]
+                   [text "checker set"],
+                    p [style "text-align" "left", style "font-size" "large" ]
+                      [text "Chose gpt modl (type : gpt-3.5-turbo , gtp-4)",
+                       div [style "margin" "0px 0px 20px 0px"][Html.input [type_ "text", value k, onInput (updateG m )][]],
+                       text "Chose number of turns (type : turns number)",
+                       div [][Html.input [type_ "text", value it, onInput (updateT m )][]]
+                    ]]
 
 
 
