@@ -28,7 +28,7 @@ data FSMEnv = FSMEnv { port :: Int
                      } deriving (Show, Generic, ToJSON, FromJSON)
 
 
-data ReqJson = ReqJson {schema :: String
+data ReqGetAgda = ReqGetAgda {schema :: String
                     , mode :: String
                     } deriving (Show, Generic, ToJSON, FromJSON)
 
@@ -37,4 +37,11 @@ data Mode = Mb | Pi deriving (Show, Generic, ToJSON, FromJSON)
 data ResponseTC = ResponseTC{ output :: String
                               , status :: Int} deriving (Show,  Generic, ToJSON, FromJSON)
 
+
+data ReqCheckAgda = ReqCheckAgda {agdaCode :: String
+                    , prompt1 :: String
+                    , prompt2 :: String
+                    , turns :: Int
+                    , model :: String
+                    } deriving (Show, Generic, ToJSON, FromJSON)
 

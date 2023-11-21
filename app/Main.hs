@@ -68,6 +68,10 @@ mainAPI env =do
 
     get "/help" $  text  $ TL.fromStrict infoWeb
 
+    post "checkAgda" $ do
+      body <- jsonData :: ActionM ReqCheckAgda
+      let test = prompt1 body
+      text $ TL.pack test
 
     -- post "/update" $ do
     --   body  <- jsonData :: ActionM ReqJson
@@ -79,9 +83,9 @@ mainAPI env =do
     --   agda <-liftIO $ createAndCompileAgda bs
     --   text $ TL.pack agda
 
-    options "/getAgda" $ text "Success"
+    -- options "/getAgda" $ text "Success"
     post "/getAgda" $ do
-      body  <- jsonData :: ActionM ReqJson
+      body  <- jsonData :: ActionM ReqGetAgda
       let bs = case B64.decode  ( (TL.encodeUtf8 . TL.pack ) (schema body)) of
             Right x  -> x
             _ -> "empty"

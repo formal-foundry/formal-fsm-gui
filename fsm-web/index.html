@@ -5385,25 +5385,28 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$element = _Browser_element;
-var $author$project$Main$BSchema = {$: 'BSchema'};
-var $author$project$Main$Init = F2(
+var $author$project$Types$BSchema = {$: 'BSchema'};
+var $author$project$Types$Init = F2(
 	function (a, b) {
 		return {$: 'Init', a: a, b: b};
 	});
-var $author$project$Main$initSet = {someSet: $elm$core$Maybe$Nothing};
-var $author$project$Main$initInput = {agdaValue: 'Waiting For Server', checkerRes: $elm$core$Maybe$Nothing, jsonSchema: '', prompt1: $elm$core$Maybe$Nothing, prompt2: $elm$core$Maybe$Nothing, setting: $author$project$Main$initSet};
+var $author$project$Main$ex = '\n{\n  "id": "New Machine",\n  "initial": "idle",\n  "states": {\n    "idle": {\n      "on": {\n        "insertCoin": {\n          "target": "selecting"\n        }\n      }\n    },\n    "selecting": {\n      "on": {\n        "selectProduct": {\n          "target": "paid"\n        },\n        "cancelSelecting": {\n          "target": "idle"\n        }\n      }\n    },\n    "paid": {\n      "on": {\n        "dispensing": {\n          "target": "dispensing"\n        },\n        "cancelPurchase": {\n          "target": "selecting"\n        }\n      }\n    },\n    "dispensing": {\n      "on": {\n        "collectProduct": {\n          "target": "idle"\n        }\n      }\n    }\n  }\n}';
+var $author$project$Main$exp1 = '\nTask: Implement a function with the following type signature in Agda:\n\n{function_type}\n\nCurrent Agda code:\n\n{agda_code}\n\nPlease provide the exact Agda code that I need to append to the existing code to implement the function according to the given type >\n\nfrom this momemn, I will always append your code to my code, please reemeber about this, this is important.\n\nDo not duplicate my code, always print only the code that I need to add at the end of already existing code.\n\n   ';
+var $author$project$Main$exp2 = '\nHi GPT, I tried implementing the function using the code you provided, but I encountered some errors during compilation. Here\'s the >\n\n{agda_code_with_changes}\n\nThe compiler reported the following errors:\n\n{compiler_errors}\n\nCould you please help me fix these errors? Provide any necessary modifications to the existing code or additional Agda code to resol>\n  ';
+var $author$project$Main$initSet = {codeMode: 'pi', gpt: 'gpt-3.5-turbo', turns: '5'};
+var $author$project$Main$initInput = {agdaValue: 'Waiting For Agda Code ...', checkerRes: $elm$core$Maybe$Nothing, jsonSchema: $author$project$Main$ex, prompt1: $author$project$Main$exp1, prompt2: $author$project$Main$exp2, setting: $author$project$Main$initSet};
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
-		A2($author$project$Main$Init, $author$project$Main$initInput, $author$project$Main$BSchema),
+		A2($author$project$Types$Init, $author$project$Main$initInput, $author$project$Types$BSchema),
 		$elm$core$Platform$Cmd$none);
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
-var $author$project$Main$WaitingForAgdaCheck = F2(
-	function (a, b) {
-		return {$: 'WaitingForAgdaCheck', a: a, b: b};
+var $author$project$Types$WaitingForAgdaCheck = F4(
+	function (a, b, c, d) {
+		return {$: 'WaitingForAgdaCheck', a: a, b: b, c: c, d: d};
 	});
 var $author$project$Main$buildErrorMessage = function (result) {
 	if (result.$ === 'Ok') {
@@ -5434,45 +5437,55 @@ var $author$project$Main$afterGen = F2(
 		if (m.$ === 'WaitingForAgdaFile') {
 			var ei = m.a;
 			var b = m.b;
-			return A2(
-				$author$project$Main$WaitingForAgdaCheck,
+			var x = m.c;
+			var y = m.d;
+			return A4(
+				$author$project$Types$WaitingForAgdaCheck,
 				_Utils_update(
 					ei,
 					{agdaValue: newA}),
-				b);
+				b,
+				x,
+				y);
 		} else {
-			return A2($author$project$Main$Init, $author$project$Main$initInput, $author$project$Main$BSchema);
+			return A2($author$project$Types$Init, $author$project$Main$initInput, $author$project$Types$BSchema);
 		}
 	});
-var $author$project$Main$DisplayResults = F2(
-	function (a, b) {
-		return {$: 'DisplayResults', a: a, b: b};
+var $author$project$Types$DisplayResults = F4(
+	function (a, b, c, d) {
+		return {$: 'DisplayResults', a: a, b: b, c: c, d: d};
 	});
-var $author$project$Main$WaitingForAgdaFile = F2(
-	function (a, b) {
-		return {$: 'WaitingForAgdaFile', a: a, b: b};
+var $author$project$Types$WaitingForAgdaFile = F4(
+	function (a, b, c, d) {
+		return {$: 'WaitingForAgdaFile', a: a, b: b, c: c, d: d};
 	});
 var $author$project$Main$buttonChanger = F2(
 	function (b, m) {
 		switch (m.$) {
 			case 'Init':
 				var i = m.a;
-				return A2($author$project$Main$Init, i, b);
+				return A2($author$project$Types$Init, i, b);
 			case 'WaitingForAgdaFile':
 				var i = m.a;
 				var e = m.b;
-				return A2($author$project$Main$WaitingForAgdaFile, i, b);
+				var x = m.c;
+				var y = m.d;
+				return A4($author$project$Types$WaitingForAgdaFile, i, b, x, y);
 			case 'WaitingForAgdaCheck':
 				var i = m.a;
 				var e = m.b;
-				return A2($author$project$Main$WaitingForAgdaCheck, i, b);
+				var x = m.c;
+				var y = m.d;
+				return A4($author$project$Types$WaitingForAgdaCheck, i, b, x, y);
 			default:
 				var i = m.a;
 				var e = m.b;
-				return A2($author$project$Main$DisplayResults, i, b);
+				var x = m.c;
+				var y = m.d;
+				return A4($author$project$Types$DisplayResults, i, b, x, y);
 		}
 	});
-var $author$project$Main$Generator = F2(
+var $author$project$Types$Generator = F2(
 	function (a, b) {
 		return {$: 'Generator', a: a, b: b};
 	});
@@ -6494,7 +6507,12 @@ var $author$project$Main$getAgda = function (m) {
 	var mo = function () {
 		if (m.$ === 'WaitingForAgdaFile') {
 			var i = m.a;
-			return 'pi';
+			return function ($) {
+				return $.codeMode;
+			}(
+				function ($) {
+					return $.setting;
+				}(i));
 		} else {
 			return 'pi';
 		}
@@ -6511,10 +6529,10 @@ var $author$project$Main$getAgda = function (m) {
 								$truqu$elm_base64$Base64$encode(s))),
 							_Utils_Tuple2(
 							'mode',
-							$elm$json$Json$Encode$string('info Val'))
+							$elm$json$Json$Encode$string('pi'))
 						]))),
 			expect: $elm$http$Http$expectString(
-				$author$project$Main$Generator(m)),
+				$author$project$Types$Generator(m)),
 			url: 'http://localhost:3456/getAgda'
 		});
 };
@@ -6525,40 +6543,81 @@ var $author$project$Main$updateA = F2(
 			case 'Init':
 				var ei = m.a;
 				var b = m.b;
-				return A2($author$project$Main$Init, ei, b);
+				return A2($author$project$Types$Init, ei, b);
 			case 'WaitingForAgdaFile':
 				var ei = m.a;
 				var b = m.b;
-				return A2($author$project$Main$WaitingForAgdaFile, ei, b);
+				var x = m.c;
+				var y = m.d;
+				return A4($author$project$Types$WaitingForAgdaFile, ei, b, x, y);
 			case 'WaitingForAgdaCheck':
 				var ei = m.a;
 				var b = m.b;
-				return A2($author$project$Main$WaitingForAgdaCheck, i, b);
+				var x = m.c;
+				var y = m.d;
+				return A4($author$project$Types$WaitingForAgdaCheck, i, b, x, y);
 			default:
 				var ei = m.a;
 				var b = m.b;
-				return A2($author$project$Main$DisplayResults, i, b);
+				var x = m.c;
+				var y = m.d;
+				return A4($author$project$Types$DisplayResults, i, b, x, y);
 		}
 	});
+var $author$project$Main$updateDef = F2(
+	function (i, m) {
+		switch (m.$) {
+			case 'Init':
+				var ei = m.a;
+				var b = m.b;
+				return A2($author$project$Types$Init, i, b);
+			case 'WaitingForAgdaFile':
+				var ei = m.a;
+				var b = m.b;
+				var x = m.c;
+				var y = m.d;
+				return A4($author$project$Types$WaitingForAgdaFile, ei, b, x, y);
+			case 'WaitingForAgdaCheck':
+				var ei = m.a;
+				var b = m.b;
+				var x = m.c;
+				var y = m.d;
+				return A4($author$project$Types$WaitingForAgdaCheck, i, b, x, y);
+			default:
+				var ei = m.a;
+				var b = m.b;
+				var x = m.c;
+				var y = m.d;
+				return A4($author$project$Types$DisplayResults, i, b, x, y);
+		}
+	});
+var $author$project$Types$RGeneral = {$: 'RGeneral'};
+var $author$project$Types$resex = {newCode: 'Waiting for AGA ...', other: 'some..'};
 var $author$project$Main$updateS = F2(
 	function (i, m) {
 		switch (m.$) {
 			case 'Init':
 				var ei = m.a;
 				var b = m.b;
-				return A2($author$project$Main$WaitingForAgdaFile, i, b);
+				return A4($author$project$Types$WaitingForAgdaFile, i, b, $author$project$Types$resex, $author$project$Types$RGeneral);
 			case 'WaitingForAgdaFile':
 				var ei = m.a;
 				var b = m.b;
-				return A2($author$project$Main$WaitingForAgdaFile, i, b);
+				var x = m.c;
+				var y = m.d;
+				return A4($author$project$Types$WaitingForAgdaFile, i, b, x, y);
 			case 'WaitingForAgdaCheck':
 				var ei = m.a;
 				var b = m.b;
-				return A2($author$project$Main$WaitingForAgdaCheck, i, b);
+				var x = m.c;
+				var y = m.d;
+				return A4($author$project$Types$WaitingForAgdaFile, i, b, x, y);
 			default:
 				var ei = m.a;
 				var b = m.b;
-				return A2($author$project$Main$WaitingForAgdaFile, i, b);
+				var x = m.c;
+				var y = m.d;
+				return A4($author$project$Types$WaitingForAgdaFile, i, b, x, y);
 		}
 	});
 var $author$project$Main$update = F2(
@@ -6566,7 +6625,7 @@ var $author$project$Main$update = F2(
 		switch (msg.$) {
 			case 'Restart':
 				return _Utils_Tuple2(
-					A2($author$project$Main$Init, $author$project$Main$initInput, $author$project$Main$BSchema),
+					A2($author$project$Types$Init, $author$project$Main$initInput, $author$project$Types$BSchema),
 					$elm$browser$Browser$Navigation$reload);
 			case 'UpdateSchema':
 				var i = msg.a;
@@ -6577,6 +6636,31 @@ var $author$project$Main$update = F2(
 				var i = msg.a;
 				return _Utils_Tuple2(
 					A2($author$project$Main$updateA, i, model),
+					$elm$core$Platform$Cmd$none);
+			case 'UpdateP1':
+				var i = msg.a;
+				return _Utils_Tuple2(
+					A2($author$project$Main$updateDef, i, model),
+					$elm$core$Platform$Cmd$none);
+			case 'UpdateP2':
+				var i = msg.a;
+				return _Utils_Tuple2(
+					A2($author$project$Main$updateDef, i, model),
+					$elm$core$Platform$Cmd$none);
+			case 'UpdateAM':
+				var i = msg.a;
+				return _Utils_Tuple2(
+					A2($author$project$Main$updateDef, i, model),
+					$elm$core$Platform$Cmd$none);
+			case 'UpdateT':
+				var i = msg.a;
+				return _Utils_Tuple2(
+					A2($author$project$Main$updateDef, i, model),
+					$elm$core$Platform$Cmd$none);
+			case 'UpdateG':
+				var i = msg.a;
+				return _Utils_Tuple2(
+					A2($author$project$Main$updateDef, i, model),
 					$elm$core$Platform$Cmd$none);
 			case 'ChangeBookMark':
 				var b = msg.a;
@@ -6589,7 +6673,7 @@ var $author$project$Main$update = F2(
 					$author$project$Main$getAgda(model));
 			case 'CheckAgda':
 				return _Utils_Tuple2(
-					A2($author$project$Main$Init, $author$project$Main$initInput, $author$project$Main$BSchema),
+					A2($author$project$Types$Init, $author$project$Main$initInput, $author$project$Types$BSchema),
 					$elm$core$Platform$Cmd$none);
 			case 'Generator':
 				var m = msg.a;
@@ -6598,14 +6682,16 @@ var $author$project$Main$update = F2(
 					A2($author$project$Main$afterGen, m, res),
 					$elm$core$Platform$Cmd$none);
 			default:
+				var m = msg.a;
+				var res = msg.b;
 				return _Utils_Tuple2(
-					A2($author$project$Main$Init, $author$project$Main$initInput, $author$project$Main$BSchema),
+					A2($author$project$Types$Init, $author$project$Main$initInput, $author$project$Types$BSchema),
 					$elm$core$Platform$Cmd$none);
 		}
 	});
 var $elm$html$Html$div = _VirtualDom_node('div');
-var $author$project$Main$GenAgda = {$: 'GenAgda'};
-var $author$project$Main$Restart = {$: 'Restart'};
+var $author$project$Types$GenAgda = {$: 'GenAgda'};
+var $author$project$Types$Restart = {$: 'Restart'};
 var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$json$Json$Encode$bool = _Json_wrap;
 var $elm$html$Html$Attributes$boolProperty = F2(
@@ -6681,7 +6767,7 @@ var $author$project$Main$divB = function (m) {
 						A2($elm$html$Html$Attributes$style, 'font-size', 'large'),
 						A2($elm$html$Html$Attributes$style, 'padding', '7px'),
 						$elm$html$Html$Attributes$disabled(agda),
-						$elm$html$Html$Events$onClick($author$project$Main$GenAgda)
+						$elm$html$Html$Events$onClick($author$project$Types$GenAgda)
 					]),
 				_List_fromArray(
 					[
@@ -6694,7 +6780,7 @@ var $author$project$Main$divB = function (m) {
 						A2($elm$html$Html$Attributes$style, 'font-size', 'large'),
 						A2($elm$html$Html$Attributes$style, 'padding', '7px'),
 						$elm$html$Html$Attributes$disabled(clear),
-						$elm$html$Html$Events$onClick($author$project$Main$Restart)
+						$elm$html$Html$Events$onClick($author$project$Types$Restart)
 					]),
 				_List_fromArray(
 					[
@@ -6707,48 +6793,12 @@ var $author$project$Main$divB = function (m) {
 						A2($elm$html$Html$Attributes$style, 'font-size', 'large'),
 						A2($elm$html$Html$Attributes$style, 'padding', '7px'),
 						$elm$html$Html$Attributes$disabled(check),
-						$elm$html$Html$Events$onClick($author$project$Main$Restart)
+						$elm$html$Html$Events$onClick($author$project$Types$Restart)
 					]),
 				_List_fromArray(
 					[
 						$elm$html$Html$text('Check Agda')
 					]))
-			]));
-};
-var $author$project$Main$agdaDiv = function (m) {
-	return A2(
-		$elm$html$Html$div,
-		_List_fromArray(
-			[
-				A2($elm$html$Html$Attributes$style, 'height', '350px')
-			]),
-		_List_fromArray(
-			[
-				$elm$html$Html$text('agda')
-			]));
-};
-var $author$project$Main$p1Div = function (m) {
-	return A2(
-		$elm$html$Html$div,
-		_List_fromArray(
-			[
-				A2($elm$html$Html$Attributes$style, 'height', '350px')
-			]),
-		_List_fromArray(
-			[
-				$elm$html$Html$text('p1')
-			]));
-};
-var $author$project$Main$p2Div = function (m) {
-	return A2(
-		$elm$html$Html$div,
-		_List_fromArray(
-			[
-				A2($elm$html$Html$Attributes$style, 'height', '350px')
-			]),
-		_List_fromArray(
-			[
-				$elm$html$Html$text('p2')
 			]));
 };
 var $elm$html$Html$Events$alwaysStop = function (x) {
@@ -6785,39 +6835,439 @@ var $elm$html$Html$Events$onInput = function (tagger) {
 			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
 };
 var $elm$html$Html$textarea = _VirtualDom_node('textarea');
-var $author$project$Main$UpdateSchema = function (a) {
+var $author$project$Types$UpdateAgda = function (a) {
+	return {$: 'UpdateAgda', a: a};
+};
+var $author$project$Input$updateAgda = F2(
+	function (m, s) {
+		switch (m.$) {
+			case 'WaitingForAgdaCheck':
+				var i = m.a;
+				return $author$project$Types$UpdateAgda(
+					_Utils_update(
+						i,
+						{agdaValue: s}));
+			case 'DisplayResults':
+				var i = m.a;
+				return $author$project$Types$UpdateAgda(
+					_Utils_update(
+						i,
+						{agdaValue: s}));
+			default:
+				return $author$project$Types$Restart;
+		}
+	});
+var $author$project$Input$agdaDiv = function (m) {
+	var s = function () {
+		switch (m.$) {
+			case 'Init':
+				var i = m.a;
+				return function ($) {
+					return $.agdaValue;
+				}(i);
+			case 'WaitingForAgdaFile':
+				var i = m.a;
+				return function ($) {
+					return $.agdaValue;
+				}(i);
+			case 'WaitingForAgdaCheck':
+				var i = m.a;
+				return function ($) {
+					return $.agdaValue;
+				}(i);
+			default:
+				var i = m.a;
+				return function ($) {
+					return $.agdaValue;
+				}(i);
+		}
+	}();
+	switch (m.$) {
+		case 'Init':
+			return A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'height', '350px')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Waiting For Agda Code ...')
+					]));
+		case 'WaitingForAgdaFile':
+			return A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'height', '350px')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Waiting For Agda Code ...')
+					]));
+		case 'WaitingForAgdaCheck':
+			return A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'height', '350px')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								A2($elm$html$Html$Attributes$style, 'text-align', 'center'),
+								A2($elm$html$Html$Attributes$style, 'border-bottom', 'double'),
+								A2($elm$html$Html$Attributes$style, 'font-size', 'large')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Edit Agda code below')
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_Nil,
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$textarea,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'width', '95%'),
+										A2($elm$html$Html$Attributes$style, 'margin-left', '4px'),
+										A2($elm$html$Html$Attributes$style, 'height', '300px'),
+										$elm$html$Html$Events$onInput(
+										$author$project$Input$updateAgda(m))
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text(s)
+									]))
+							]))
+					]));
+		default:
+			return A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'height', '350px')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								A2($elm$html$Html$Attributes$style, 'text-align', 'center'),
+								A2($elm$html$Html$Attributes$style, 'border-bottom', 'double'),
+								A2($elm$html$Html$Attributes$style, 'font-size', 'large')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Edit Agda code below')
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_Nil,
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$textarea,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'width', '95%'),
+										A2($elm$html$Html$Attributes$style, 'margin-left', '4px'),
+										A2($elm$html$Html$Attributes$style, 'height', '300px'),
+										$elm$html$Html$Events$onInput(
+										$author$project$Input$updateAgda(m))
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text(s)
+									]))
+							]))
+					]));
+	}
+};
+var $author$project$Input$updatep1 = F2(
+	function (m, s) {
+		switch (m.$) {
+			case 'WaitingForAgdaCheck':
+				var i = m.a;
+				return $author$project$Types$UpdateAgda(
+					_Utils_update(
+						i,
+						{prompt1: s}));
+			case 'DisplayResults':
+				var i = m.a;
+				return $author$project$Types$UpdateAgda(
+					_Utils_update(
+						i,
+						{prompt1: s}));
+			default:
+				return $author$project$Types$Restart;
+		}
+	});
+var $author$project$Input$p1Div = function (m) {
+	var s = function () {
+		switch (m.$) {
+			case 'Init':
+				var i = m.a;
+				return 'Waiting For Agda Code ...';
+			case 'WaitingForAgdaFile':
+				var i = m.a;
+				return 'Waiting For Agda Code ...';
+			case 'WaitingForAgdaCheck':
+				var i = m.a;
+				return function ($) {
+					return $.prompt1;
+				}(i);
+			default:
+				var i = m.a;
+				return function ($) {
+					return $.prompt1;
+				}(i);
+		}
+	}();
+	switch (m.$) {
+		case 'Init':
+			return A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'height', '350px')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Waiting For Agda Code ...')
+					]));
+		case 'WaitingForAgdaFile':
+			var i = m.a;
+			return A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'height', '350px')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Waiting For Agda Code ...')
+					]));
+		case 'WaitingForAgdaCheck':
+			var i = m.a;
+			return A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'height', '350px')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$textarea,
+						_List_fromArray(
+							[
+								A2($elm$html$Html$Attributes$style, 'width', '95%'),
+								A2($elm$html$Html$Attributes$style, 'margin-left', '4px'),
+								A2($elm$html$Html$Attributes$style, 'height', '300px'),
+								$elm$html$Html$Events$onInput(
+								$author$project$Input$updatep1(m))
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text(s)
+							]))
+					]));
+		default:
+			var i = m.a;
+			return A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'height', '350px')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$textarea,
+						_List_fromArray(
+							[
+								A2($elm$html$Html$Attributes$style, 'width', '95%'),
+								A2($elm$html$Html$Attributes$style, 'margin-left', '4px'),
+								A2($elm$html$Html$Attributes$style, 'height', '300px'),
+								$elm$html$Html$Events$onInput(
+								$author$project$Input$updatep1(m))
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text(s)
+							]))
+					]));
+	}
+};
+var $author$project$Input$updatep2 = F2(
+	function (m, s) {
+		switch (m.$) {
+			case 'WaitingForAgdaCheck':
+				var i = m.a;
+				return $author$project$Types$UpdateAgda(
+					_Utils_update(
+						i,
+						{prompt2: s}));
+			case 'DisplayResults':
+				var i = m.a;
+				return $author$project$Types$UpdateAgda(
+					_Utils_update(
+						i,
+						{prompt2: s}));
+			default:
+				return $author$project$Types$Restart;
+		}
+	});
+var $author$project$Input$p2Div = function (m) {
+	var s = function () {
+		switch (m.$) {
+			case 'Init':
+				var i = m.a;
+				return 'Waiting For Agda Code ...';
+			case 'WaitingForAgdaFile':
+				var i = m.a;
+				return 'Waiting For Agda Code ...';
+			case 'WaitingForAgdaCheck':
+				var i = m.a;
+				return function ($) {
+					return $.prompt2;
+				}(i);
+			default:
+				var i = m.a;
+				return function ($) {
+					return $.prompt2;
+				}(i);
+		}
+	}();
+	switch (m.$) {
+		case 'Init':
+			return A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'height', '350px')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Waiting For Agda Code ...')
+					]));
+		case 'WaitingForAgdaFile':
+			var i = m.a;
+			return A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'height', '350px')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Waiting For Agda Code ...')
+					]));
+		case 'WaitingForAgdaCheck':
+			var i = m.a;
+			return A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								A2($elm$html$Html$Attributes$style, 'height', '350px')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$textarea,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'width', '95%'),
+										A2($elm$html$Html$Attributes$style, 'margin-left', '4px'),
+										A2($elm$html$Html$Attributes$style, 'height', '300px'),
+										$elm$html$Html$Events$onInput(
+										$author$project$Input$updatep2(m))
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text(s)
+									]))
+							]))
+					]));
+		default:
+			var i = m.a;
+			return A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								A2($elm$html$Html$Attributes$style, 'height', '350px')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$textarea,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'width', '95%'),
+										A2($elm$html$Html$Attributes$style, 'margin-left', '4px'),
+										A2($elm$html$Html$Attributes$style, 'height', '300px'),
+										$elm$html$Html$Events$onInput(
+										$author$project$Input$updatep2(m))
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text(s)
+									]))
+							]))
+					]));
+	}
+};
+var $author$project$Types$UpdateSchema = function (a) {
 	return {$: 'UpdateSchema', a: a};
 };
-var $author$project$Main$updateJson = F2(
+var $author$project$Input$updateJson = F2(
 	function (m, s) {
 		switch (m.$) {
 			case 'Init':
 				var i = m.a;
-				return $author$project$Main$UpdateSchema(
+				return $author$project$Types$UpdateSchema(
 					_Utils_update(
 						i,
 						{jsonSchema: s}));
 			case 'WaitingForAgdaFile':
 				var i = m.a;
-				return $author$project$Main$UpdateSchema(
+				return $author$project$Types$UpdateSchema(
 					_Utils_update(
 						i,
 						{jsonSchema: s}));
 			case 'WaitingForAgdaCheck':
 				var i = m.a;
-				return $author$project$Main$UpdateSchema(
+				return $author$project$Types$UpdateSchema(
 					_Utils_update(
 						i,
 						{jsonSchema: s}));
 			default:
 				var i = m.a;
-				return $author$project$Main$UpdateSchema(
+				return $author$project$Types$UpdateSchema(
 					_Utils_update(
 						i,
 						{jsonSchema: s}));
 		}
 	});
-var $author$project$Main$schemaDiv = function (m) {
+var $author$project$Input$schemaDiv = function (m) {
 	var s = function () {
 		switch (m.$) {
 			case 'Init':
@@ -6870,7 +7320,7 @@ var $author$project$Main$schemaDiv = function (m) {
 						A2($elm$html$Html$Attributes$style, 'margin-left', '4px'),
 						A2($elm$html$Html$Attributes$style, 'height', '300px'),
 						$elm$html$Html$Events$onInput(
-						$author$project$Main$updateJson(m))
+						$author$project$Input$updateJson(m))
 					]),
 				_List_fromArray(
 					[
@@ -6878,7 +7328,308 @@ var $author$project$Main$schemaDiv = function (m) {
 					]))
 			]));
 };
-var $author$project$Main$setDiv = function (m) {
+var $elm$html$Html$input = _VirtualDom_node('input');
+var $elm$html$Html$p = _VirtualDom_node('p');
+var $elm$html$Html$Attributes$stringProperty = F2(
+	function (key, string) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$string(string));
+	});
+var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
+var $author$project$Types$UpdateAM = function (a) {
+	return {$: 'UpdateAM', a: a};
+};
+var $author$project$Input$setSet = F2(
+	function (fn, i) {
+		return _Utils_update(
+			i,
+			{
+				setting: fn(i.setting)
+			});
+	});
+var $author$project$Input$setVmode = F2(
+	function (s, v) {
+		return _Utils_update(
+			v,
+			{codeMode: s});
+	});
+var $author$project$Input$updateAC = F2(
+	function (m, s) {
+		switch (m.$) {
+			case 'Init':
+				var i = m.a;
+				return $author$project$Types$UpdateAM(
+					$author$project$Input$setSet(
+						$author$project$Input$setVmode(s))(i));
+			case 'WaitingForAgdaFile':
+				var i = m.a;
+				return $author$project$Types$UpdateAM(
+					$author$project$Input$setSet(
+						$author$project$Input$setVmode(s))(i));
+			case 'WaitingForAgdaCheck':
+				var i = m.a;
+				return $author$project$Types$UpdateAM(
+					$author$project$Input$setSet(
+						$author$project$Input$setVmode(s))(i));
+			default:
+				var i = m.a;
+				return $author$project$Types$UpdateAM(
+					$author$project$Input$setSet(
+						$author$project$Input$setVmode(s))(i));
+		}
+	});
+var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
+var $author$project$Input$agdaSetDiv = function (m) {
+	var t = function () {
+		switch (m.$) {
+			case 'Init':
+				var i = m.a;
+				return function ($) {
+					return $.codeMode;
+				}(
+					function ($) {
+						return $.setting;
+					}(i));
+			case 'WaitingForAgdaFile':
+				var i = m.a;
+				return function ($) {
+					return $.codeMode;
+				}(
+					function ($) {
+						return $.setting;
+					}(i));
+			case 'WaitingForAgdaCheck':
+				var i = m.a;
+				return function ($) {
+					return $.codeMode;
+				}(
+					function ($) {
+						return $.setting;
+					}(i));
+			default:
+				var i = m.a;
+				return function ($) {
+					return $.codeMode;
+				}(
+					function ($) {
+						return $.setting;
+					}(i));
+		}
+	}();
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				A2($elm$html$Html$Attributes$style, 'text-align', 'center'),
+				A2($elm$html$Html$Attributes$style, 'font-size', 'large'),
+				A2($elm$html$Html$Attributes$style, 'border-bottom', 'double')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$p,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'font-size', 'large'),
+						A2($elm$html$Html$Attributes$style, 'font-weight', 'bold')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('agda set')
+					])),
+				A2(
+				$elm$html$Html$p,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'text-align', 'left'),
+						A2($elm$html$Html$Attributes$style, 'font-size', 'large')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Chose Agda file output (type : pi , mb)'),
+						A2(
+						$elm$html$Html$div,
+						_List_Nil,
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$input,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$type_('text'),
+										$elm$html$Html$Attributes$value(t),
+										$elm$html$Html$Events$onInput(
+										$author$project$Input$updateAC(m))
+									]),
+								_List_Nil)
+							]))
+					]))
+			]));
+};
+var $author$project$Input$setVgpt = F2(
+	function (s, v) {
+		return _Utils_update(
+			v,
+			{gpt: s});
+	});
+var $author$project$Input$updateG = F2(
+	function (m, s) {
+		switch (m.$) {
+			case 'Init':
+				var i = m.a;
+				return $author$project$Types$UpdateAM(
+					$author$project$Input$setSet(
+						$author$project$Input$setVgpt(s))(i));
+			case 'WaitingForAgdaFile':
+				var i = m.a;
+				return $author$project$Types$UpdateAM(
+					$author$project$Input$setSet(
+						$author$project$Input$setVgpt(s))(i));
+			case 'WaitingForAgdaCheck':
+				var i = m.a;
+				return $author$project$Types$UpdateAM(
+					$author$project$Input$setSet(
+						$author$project$Input$setVgpt(s))(i));
+			default:
+				var i = m.a;
+				return $author$project$Types$UpdateAM(
+					$author$project$Input$setSet(
+						$author$project$Input$setVgpt(s))(i));
+		}
+	});
+var $author$project$Input$setVturns = F2(
+	function (i, v) {
+		return _Utils_update(
+			v,
+			{turns: i});
+	});
+var $author$project$Input$updateT = F2(
+	function (m, s) {
+		switch (m.$) {
+			case 'Init':
+				var i = m.a;
+				return $author$project$Types$UpdateAM(
+					$author$project$Input$setSet(
+						$author$project$Input$setVturns(s))(i));
+			case 'WaitingForAgdaFile':
+				var i = m.a;
+				return $author$project$Types$UpdateAM(
+					$author$project$Input$setSet(
+						$author$project$Input$setVturns(s))(i));
+			case 'WaitingForAgdaCheck':
+				var i = m.a;
+				return $author$project$Types$UpdateAM(
+					$author$project$Input$setSet(
+						$author$project$Input$setVturns(s))(i));
+			default:
+				var i = m.a;
+				return $author$project$Types$UpdateAM(
+					$author$project$Input$setSet(
+						$author$project$Input$setVturns(s))(i));
+		}
+	});
+var $author$project$Input$checkerSetDiv = function (m) {
+	var inp = function () {
+		switch (m.$) {
+			case 'Init':
+				var i = m.a;
+				return i;
+			case 'WaitingForAgdaFile':
+				var i = m.a;
+				return i;
+			case 'WaitingForAgdaCheck':
+				var i = m.a;
+				return i;
+			default:
+				var i = m.a;
+				return i;
+		}
+	}();
+	var it = function ($) {
+		return $.turns;
+	}(
+		function ($) {
+			return $.setting;
+		}(inp));
+	var k = function ($) {
+		return $.gpt;
+	}(
+		function ($) {
+			return $.setting;
+		}(inp));
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				A2($elm$html$Html$Attributes$style, 'text-align', 'center'),
+				A2($elm$html$Html$Attributes$style, 'font-size', 'large'),
+				A2($elm$html$Html$Attributes$style, 'border-bottom', 'double')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$p,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'font-size', 'large'),
+						A2($elm$html$Html$Attributes$style, 'font-weight', 'bold')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('checker set')
+					])),
+				A2(
+				$elm$html$Html$p,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'text-align', 'left'),
+						A2($elm$html$Html$Attributes$style, 'font-size', 'large')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Chose gpt modl (type : gpt-3.5-turbo , gtp-4)'),
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								A2($elm$html$Html$Attributes$style, 'margin', '0px 0px 20px 0px')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$input,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$type_('text'),
+										$elm$html$Html$Attributes$value(k),
+										$elm$html$Html$Events$onInput(
+										$author$project$Input$updateG(m))
+									]),
+								_List_Nil)
+							])),
+						$elm$html$Html$text('Chose number of turns (type : turns number)'),
+						A2(
+						$elm$html$Html$div,
+						_List_Nil,
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$input,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$type_('text'),
+										$elm$html$Html$Attributes$value(it),
+										$elm$html$Html$Events$onInput(
+										$author$project$Input$updateT(m))
+									]),
+								_List_Nil)
+							]))
+					]))
+			]));
+};
+var $author$project$Input$setDiv = function (m) {
 	return A2(
 		$elm$html$Html$div,
 		_List_fromArray(
@@ -6887,52 +7638,59 @@ var $author$project$Main$setDiv = function (m) {
 			]),
 		_List_fromArray(
 			[
-				$elm$html$Html$text('set')
+				$author$project$Input$agdaSetDiv(m),
+				$author$project$Input$checkerSetDiv(m)
 			]));
 };
-var $author$project$Main$butChoise = F2(
+var $author$project$Input$butChoise = F2(
 	function (b, m) {
 		switch (b.$) {
 			case 'BSchema':
-				return $author$project$Main$schemaDiv(m);
+				return $author$project$Input$schemaDiv(m);
 			case 'BAgda':
-				return $author$project$Main$agdaDiv(m);
+				return $author$project$Input$agdaDiv(m);
 			case 'BP1':
-				return $author$project$Main$p1Div(m);
+				return $author$project$Input$p1Div(m);
 			case 'BP2':
-				return $author$project$Main$p2Div(m);
+				return $author$project$Input$p2Div(m);
 			default:
-				return $author$project$Main$setDiv(m);
+				return $author$project$Input$setDiv(m);
 		}
 	});
-var $author$project$Main$divIV = function (m) {
+var $author$project$Input$divIV = function (m) {
 	switch (m.$) {
 		case 'Init':
 			var i = m.a;
 			var b = m.b;
-			return A2($author$project$Main$butChoise, b, m);
+			return A2($author$project$Input$butChoise, b, m);
 		case 'WaitingForAgdaFile':
 			var i = m.a;
 			var b = m.b;
-			return A2($author$project$Main$butChoise, b, m);
+			var x = m.c;
+			var y = m.d;
+			return A2($author$project$Input$butChoise, b, m);
 		case 'WaitingForAgdaCheck':
 			var i = m.a;
 			var b = m.b;
-			return A2($author$project$Main$butChoise, b, m);
+			var x = m.c;
+			var y = m.d;
+			return A2($author$project$Input$butChoise, b, m);
 		default:
 			var i = m.a;
 			var b = m.b;
-			return A2($author$project$Main$butChoise, b, m);
+			var x = m.c;
+			var y = m.d;
+			return A2($author$project$Input$butChoise, b, m);
 	}
 };
-var $author$project$Main$BAgda = {$: 'BAgda'};
-var $author$project$Main$BP1 = {$: 'BP1'};
-var $author$project$Main$BP2 = {$: 'BP2'};
-var $author$project$Main$BSet = {$: 'BSet'};
-var $author$project$Main$ChangeBookMark = function (a) {
+var $author$project$Types$BAgda = {$: 'BAgda'};
+var $author$project$Types$BP1 = {$: 'BP1'};
+var $author$project$Types$BP2 = {$: 'BP2'};
+var $author$project$Types$BSet = {$: 'BSet'};
+var $author$project$Types$ChangeBookMark = function (a) {
 	return {$: 'ChangeBookMark', a: a};
 };
-var $author$project$Main$divMB = function (m) {
+var $author$project$Input$divMB = function (m) {
 	var set = function () {
 		switch (m.$) {
 			case 'Init':
@@ -7111,7 +7869,7 @@ var $author$project$Main$divMB = function (m) {
 						A2($elm$html$Html$Attributes$style, 'width', '100px'),
 						A2($elm$html$Html$Attributes$style, 'font-weight', s),
 						$elm$html$Html$Events$onClick(
-						$author$project$Main$ChangeBookMark($author$project$Main$BSchema))
+						$author$project$Types$ChangeBookMark($author$project$Types$BSchema))
 					]),
 				_List_fromArray(
 					[
@@ -7126,7 +7884,7 @@ var $author$project$Main$divMB = function (m) {
 						A2($elm$html$Html$Attributes$style, 'width', '100px'),
 						A2($elm$html$Html$Attributes$style, 'font-weight', a),
 						$elm$html$Html$Events$onClick(
-						$author$project$Main$ChangeBookMark($author$project$Main$BAgda))
+						$author$project$Types$ChangeBookMark($author$project$Types$BAgda))
 					]),
 				_List_fromArray(
 					[
@@ -7141,7 +7899,7 @@ var $author$project$Main$divMB = function (m) {
 						A2($elm$html$Html$Attributes$style, 'width', '100px'),
 						A2($elm$html$Html$Attributes$style, 'font-weight', p1),
 						$elm$html$Html$Events$onClick(
-						$author$project$Main$ChangeBookMark($author$project$Main$BP1))
+						$author$project$Types$ChangeBookMark($author$project$Types$BP1))
 					]),
 				_List_fromArray(
 					[
@@ -7156,7 +7914,7 @@ var $author$project$Main$divMB = function (m) {
 						A2($elm$html$Html$Attributes$style, 'width', '100px'),
 						A2($elm$html$Html$Attributes$style, 'font-weight', p2),
 						$elm$html$Html$Events$onClick(
-						$author$project$Main$ChangeBookMark($author$project$Main$BP2))
+						$author$project$Types$ChangeBookMark($author$project$Types$BP2))
 					]),
 				_List_fromArray(
 					[
@@ -7171,7 +7929,7 @@ var $author$project$Main$divMB = function (m) {
 						A2($elm$html$Html$Attributes$style, 'width', '100px'),
 						A2($elm$html$Html$Attributes$style, 'font-weight', set),
 						$elm$html$Html$Events$onClick(
-						$author$project$Main$ChangeBookMark($author$project$Main$BSet))
+						$author$project$Types$ChangeBookMark($author$project$Types$BSet))
 					]),
 				_List_fromArray(
 					[
@@ -7179,7 +7937,7 @@ var $author$project$Main$divMB = function (m) {
 					]))
 			]));
 };
-var $author$project$Main$divI = function (m) {
+var $author$project$Input$divI = function (m) {
 	return A2(
 		$elm$html$Html$div,
 		_List_fromArray(
@@ -7189,8 +7947,8 @@ var $author$project$Main$divI = function (m) {
 			]),
 		_List_fromArray(
 			[
-				$author$project$Main$divMB(m),
-				$author$project$Main$divIV(m)
+				$author$project$Input$divMB(m),
+				$author$project$Input$divIV(m)
 			]));
 };
 var $author$project$Main$getRes = function (i) {
@@ -7204,7 +7962,6 @@ var $author$project$Main$getRes = function (i) {
 		return z;
 	}
 };
-var $elm$html$Html$p = _VirtualDom_node('p');
 var $author$project$Main$divO = function (m) {
 	var res = function () {
 		switch (m.$) {
@@ -7212,10 +7969,14 @@ var $author$project$Main$divO = function (m) {
 				return 'Waiting for Agda Checker';
 			case 'WaitingForAgdaFile':
 				var i = m.a;
-				return $author$project$Main$getRes(i);
+				return function ($) {
+					return $.agdaValue;
+				}(i);
 			case 'WaitingForAgdaCheck':
 				var i = m.a;
-				return $author$project$Main$getRes(i);
+				return function ($) {
+					return $.agdaValue;
+				}(i);
 			default:
 				var i = m.a;
 				return $author$project$Main$getRes(i);
@@ -7261,7 +8022,7 @@ var $author$project$Main$divP = function (m) {
 			]),
 		_List_fromArray(
 			[
-				$author$project$Main$divI(m),
+				$author$project$Input$divI(m),
 				$author$project$Main$divO(m)
 			]));
 };
@@ -7273,13 +8034,6 @@ var $elm$html$Html$Attributes$height = function (n) {
 		$elm$core$String$fromInt(n));
 };
 var $elm$html$Html$img = _VirtualDom_node('img');
-var $elm$html$Html$Attributes$stringProperty = F2(
-	function (key, string) {
-		return A2(
-			_VirtualDom_property,
-			key,
-			$elm$json$Json$Encode$string(string));
-	});
 var $elm$html$Html$Attributes$src = function (url) {
 	return A2(
 		$elm$html$Html$Attributes$stringProperty,
