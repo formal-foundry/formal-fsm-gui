@@ -4,9 +4,8 @@
 {-# LANGUAGE QuasiQuotes #-}
 {-# OPTIONS_GHC -w #-}
 
--- https://stately.ai/registry/new
 
-module SmEx where
+module CreateAgda where
 
 import Data.String.Interpolate 
 import Data.Aeson as A
@@ -35,100 +34,6 @@ import System.Directory
 
 import Types
 
-
-
-ex1 :: ByteString
-ex1  = [i| {
-  "id": "test1",
-  "initial": "State 1",
-  "states": {
-
-"State 1": {
-      "on": {
-        "1-3 action": {
-        "target": "State 3"
-        },
-        "1-1 action": {
-          "internal": true
-        }
-      }
-    },
-    "State 3": {
-      "on":  {
-        "3-2 action": {
-          "target": "State 2"
-        },
-        "3-1 action": {
-          "target": "State 1"
-        }
-      }
-    },
-    "State 2": {
-      "on": {
-        "2-4 action": {
-
-          "target": "State 4"
-        }
-      }
-    },
-    "State 4": {
-      "on": {
-        "4-3 action": {
-          "target": "State 3"
-        },
-        "4-4 action": {
-          "internal": true
-        }
-      }
-
-}
-  }
-}
-|]
-
-
-exvm :: ByteString
-exvm  = [i|{
-  "id": "New Machine",
-  "initial": "idle",
-  "states": {
-    "idle": {
-      "on": {
-        "insertCoin": {
-          "target": "selecting"
-        }
-      }
-    },
-    "selecting": {
-      "on": {
-        "selectProduct": {
-          "target": "paid"
-        },
-        "cancelSelecting": {
-          "target": "idle"
-        }
-      }
-    },
-    "paid": {
-      "on": {
-        "dispensing": {
-          "target": "dispensing"
-        },
-        "cancelPurchase": {
-          "target": "selecting"
-        }
-      }
-    },
-    "dispensing": {
-      "on": {
-        "collectProduct": {
-          "target": "idle"
-        }
-      }
-    }
-  }
-}
-|] 
 
 
 createFSM :: ByteString -> IO (FSM String String)
@@ -316,9 +221,101 @@ dec re = do
     Just x -> return $  (output x)
 
 
+-- EX
 
-----------TESTS------------
--- test :: Int
--- test  = M.size $ states $ createFSM ex1
 
+ex1 :: ByteString
+ex1  = [i| {
+  "id": "test1",
+  "initial": "State 1",
+  "states": {
+
+"State 1": {
+      "on": {
+        "1-3 action": {
+        "target": "State 3"
+        },
+        "1-1 action": {
+          "internal": true
+        }
+      }
+    },
+    "State 3": {
+      "on":  {
+        "3-2 action": {
+          "target": "State 2"
+        },
+        "3-1 action": {
+          "target": "State 1"
+        }
+      }
+    },
+    "State 2": {
+      "on": {
+        "2-4 action": {
+
+          "target": "State 4"
+        }
+      }
+    },
+    "State 4": {
+      "on": {
+        "4-3 action": {
+          "target": "State 3"
+        },
+        "4-4 action": {
+          "internal": true
+        }
+      }
+
+}
+  }
+}
+|]
+
+
+exvm :: ByteString
+exvm  = [i|{
+  "id": "New Machine",
+  "initial": "idle",
+  "states": {
+    "idle": {
+      "on": {
+        "insertCoin": {
+          "target": "selecting"
+        }
+      }
+    },
+    "selecting": {
+      "on": {
+        "selectProduct": {
+          "target": "paid"
+        },
+        "cancelSelecting": {
+          "target": "idle"
+        }
+      }
+    },
+    "paid": {
+      "on": {
+        "dispensing": {
+          "target": "dispensing"
+        },
+        "cancelPurchase": {
+          "target": "selecting"
+        }
+      }
+    },
+    "dispensing": {
+      "on": {
+        "collectProduct": {
+          "target": "idle"
+        }
+      }
+    }
+  }
+}
+|] 
+
+-- https://stately.ai/registry/new
 
