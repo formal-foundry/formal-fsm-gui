@@ -25,8 +25,12 @@ source-repository head
 
 library
   exposed-modules:
-      Lib
-      SmEx
+      AgaExtra
+      AgaGpt
+      AgaMain
+      AgaTypes
+      AgdaApi
+      CreateAgda
       Types
   other-modules:
       Paths_fsm_agda
@@ -36,19 +40,31 @@ library
       src
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
   build-depends:
-      aeson
+      MissingH
+    , aeson
+    , ansi-terminal
     , base >=4.7 && <5
     , base64-bytestring
     , bytestring
+    , cmdargs
     , containers
     , directory
+    , filepath
+    , haskeline
     , http-client
     , http-client-tls
     , http-types
+    , mtl
     , neat-interpolation
+    , process
+    , regex-posix
+    , scheduler
     , scotty
+    , split
     , string-interpolate
     , text
+    , time >=1.11.1.1
+    , transformers
     , wai
     , wai-cors
     , wai-extra
@@ -65,20 +81,32 @@ executable fsm-agda-exe
       app
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      aeson
+      MissingH
+    , aeson
+    , ansi-terminal
     , base >=4.7 && <5
     , base64-bytestring
     , bytestring
+    , cmdargs
     , containers
     , directory
+    , filepath
     , fsm-agda
+    , haskeline
     , http-client
     , http-client-tls
     , http-types
+    , mtl
     , neat-interpolation
+    , process
+    , regex-posix
+    , scheduler
     , scotty
+    , split
     , string-interpolate
     , text
+    , time >=1.11.1.1
+    , transformers
     , wai
     , wai-cors
     , wai-extra
@@ -96,20 +124,32 @@ test-suite fsm-agda-test
       test
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      aeson
+      MissingH
+    , aeson
+    , ansi-terminal
     , base >=4.7 && <5
     , base64-bytestring
     , bytestring
+    , cmdargs
     , containers
     , directory
+    , filepath
     , fsm-agda
+    , haskeline
     , http-client
     , http-client-tls
     , http-types
+    , mtl
     , neat-interpolation
+    , process
+    , regex-posix
+    , scheduler
     , scotty
+    , split
     , string-interpolate
     , text
+    , time >=1.11.1.1
+    , transformers
     , wai
     , wai-cors
     , wai-extra

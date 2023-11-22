@@ -12,7 +12,7 @@
 module Main where
 
 import Types
-import SmEx
+import CreateAgda
 
 
 import GHC.Generics
