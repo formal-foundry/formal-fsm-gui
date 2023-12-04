@@ -62,8 +62,7 @@ mainAPI env =do
     middleware addFrameHeader
     middleware addFrameHeaderA
     middleware addFrameHeaderC
-    middleware $ staticPolicy (noDots >-> addBase "../fsm-web")
-
+    middleware $ staticPolicy (noDots >-> addBase "./fsm-web")
     options (regex "/*")  $ text "Success"
 
     get "/help" $  text  $ TL.fromStrict infoWeb
@@ -73,17 +72,6 @@ mainAPI env =do
       let test = prompt1 body
       text $ TL.pack test
 
-    -- post "/update" $ do
-    --   body  <- jsonData :: ActionM ReqJson
-    --   let bs = case B64.decode  ( (TL.encodeUtf8 . TL.pack ) (schema body)) of
-    --         Right x  -> x
-    --         _ -> "empty"
-
-    --   liftIO $ Prelude.putStrLn $ (TL.unpack . TL.decodeUtf8 ) bs
-    --   agda <-liftIO $ createAndCompileAgda bs
-    --   text $ TL.pack agda
-
-    -- options "/getAgda" $ text "Success"
     post "/getAgda" $ do
       body  <- jsonData :: ActionM ReqGetAgda
       let bs = case B64.decode  ( (TL.encodeUtf8 . TL.pack ) (schema body)) of

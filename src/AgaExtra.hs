@@ -187,7 +187,6 @@ extractProblem fp = do
   return $ Problem agda task meta fp full
 
 
-
 findMetaD :: String -> IO FilePath
 findMetaD fp = do
   let (path, file) =  splitFileName fp

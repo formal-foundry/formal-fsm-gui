@@ -48,14 +48,14 @@ loadConfigAndR :: (AGEnv  -> String -> IO ()) -> IO ()
 loadConfigAndR  mainAG = do
   pwd  <- getEnv "PWD"
   args <- cmdArgs readArgs
-  fPGpt <- check_promt "f"
-  rPGpt <- check_promt "r"
-  conf <- check_config (conF args)
+  fPGpt <- check_promt "f" -- check if ptopt exist -- dont need
+  rPGpt <- check_promt "r" -- check if ptopt exist -- dont need
+  conf <- check_config (conF args) -- check config in ./agda-gpt.... dir
   config  <- (A.decodeFileStrict conf) :: IO (Maybe FromConfig)
-  let m = case  mode args of
+  let m = case  mode args of -- set permanet
                       "Pretty" -> PrettyMode
                       _        -> DebugMode
-  case config of
+  case config of -- api should check config - no need
     Nothing -> do
      cPrint  ("\nConfig file seems to be incorrect check it:  \n" ++ conf)  Red
      putStrLn "--"
