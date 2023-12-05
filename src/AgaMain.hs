@@ -10,6 +10,7 @@
 
 module AgaMain  where
 
+import Types
 import AgaTypes
 import qualified AgaGpt as G
 import AgaExtra
@@ -39,70 +40,60 @@ import System.Environment
 
 import System.IO
 
-main :: IO ()
-main = do
-  loadConfigAndR mainAG
+-- main :: IO ()
+-- main = do
+--   loadAndR mainAG
 
 
-loadConfigAndR :: (AGEnv  -> String -> IO ()) -> IO ()
-loadConfigAndR  mainAG = do
+loadAndR :: (AGEnv  -> String -> IO ()) -> FSMEnv -> ReqCheckAgda -> String -> IO ()
+loadAndR  mainAG fsmE req tsDir= do
   pwd  <- getEnv "PWD"
-  args <- cmdArgs readArgs
-  fPGpt <- check_promt "f" -- check if ptopt exist -- dont need
-  rPGpt <- check_promt "r" -- check if ptopt exist -- dont need
-  conf <- check_config (conF args) -- check config in ./agda-gpt.... dir
-  config  <- (A.decodeFileStrict conf) :: IO (Maybe FromConfig)
-  let m = case  mode args of -- set permanet
-                      "Pretty" -> PrettyMode
-                      _        -> DebugMode
-  case config of -- api should check config - no need
-    Nothing -> do
-     cPrint  ("\nConfig file seems to be incorrect check it:  \n" ++ conf)  Red
-     putStrLn "--"
-     die "Something went wrong, try one more time"
-    Just c -> do
-      problemlist <- runReaderT buildProblemList (args, (problemsDir c))
-      writeFile (pwd++"/aga-log.txt") ( "Aga had  " ++ (show (length problemlist))++ " problems to solved\n\n")
-      let mainDir = pwd ++ "/aga-exec"
-          w16 = intToWord16 (threadsNumbers c) 
-      createDirectory $ mainDir
-      traverseConcurrently_ (ParN w16) (cAGE mainDir) problemlist
-      where
-         cAGE dir problem = do
-           setCurrentDirectory dir
-           let name = case stripPrefix (problemsDir c ++ "Problems/") (nameP problem) of
-                 Nothing -> "unknow_dir"
-                 Just x -> x
-               nameOfProblemDir = replace "/" "-" (take (length name - 5 )name)
-               dirN = dir ++ "/"  ++ nameOfProblemDir
-               newAF = "AGA-" ++ "Problem.agda"
-           createDirectory dirN
-           setCurrentDirectory dirN
-           writeFile (dirN++"/Problem.agda") (agdaP problem)
-           threadDelay 12453
-           copyFile (metaP problem) (dirN++"/Problem.json")
-           threadDelay 12453
-           copyFile "Problem.agda" "Org-Problem.agda"
+
+  let dirN = (work_dir fsmE) ++ tsDir
+  problem <- extractProblem (agdaCode req)
+  setCurrentDirectory (work_dir fsmE)
+  createDirectory tsDir  
+  --     problemlist <- runReaderT buildProblemList (args, (problemsDir c))
+  --     writeFile (pwd++"/aga-log.txt") ( "Aga had  " ++ (show (length problemlist))++ " problems to solved\n\n")
+  --     -- let mainDir = pwd ++ "/aga-exec"
+      --     w16 = intToWord16 (threadsNumbers c) 
+      -- createDirectory $ mainDir
+      -- traverseConcurrently_ (ParN w16) (cAGE mainDir) problemlist
+      -- where
+      --    cAGE dir problem = do
+      --      setCurrentDirectory dir
+      --      let name = case stripPrefix (problemsDir c ++ "Problems/") (nameP problem) of
+      --            Nothing -> "unknow_dir"
+      --            Just x -> x
+      --          nameOfProblemDir = replace "/" "-" (take (length name - 5 )name)
+      --          dirN = dir ++ "/"  ++ nameOfProblemDir
+      --          newAF = "AGA-" ++ "Problem.agda"
+      --      createDirectory dirN
+      --      setCurrentDirectory dirN
+      --      writeFile (dirN++"/Problem.agda") (agdaP problem)
+      --      threadDelay 12453
+      --      copyFile (metaP problem) (dirN++"/Problem.json")
+      --      threadDelay 12453
+      --      copyFile "Problem.agda" "Org-Problem.agda"
 
 
-           let  env = AGEnv
-                 { apiKey = gptApiKey c
-                 , orgAgdaF = dirN ++ "/Org-Problem.agda"
-                 , dirName = dirN
-                 , agdaFile = dirN ++ "/Problem.agda"
-                 , taskDescription = taskP problem
-                 , fullTask = fulltP problem
-                 , operationMode = m
-                 , maxTurns = maxT args
-                 , fGptTemp = fPGpt
-                 , rGptTemp = rPGpt
-                 , gptModel =  gpt_model c
-                 , tc_url = typeCheckerURL c
-                 , tc_key = typeCheckerKEY c
-                 , meta_l = (dirN ++ "/Problem.json")
-                 }
-           mainAG env pwd
-
+  let  env = AGEnv
+        { apiKey = gpt_key fsmE
+        , orgAgdaF = dirN ++ "/Org-Problem.agda"
+        , dirName = dirN
+        , agdaFile = dirN ++ "/Problem.agda"
+        , taskDescription = taskP problem
+        , fullTask = fulltP problem
+        , operationMode = PrettyMode
+        , maxTurns = turns req
+        , fGptTemp = prompt1 req
+        , rGptTemp = prompt2 req
+        , gptModel = modelR req
+        , tc_url = tChecker_url fsmE
+        , tc_key = tChecker_key fsmE
+        , meta_l = ((work_dir fsmE)++ "/Problem.json")
+        }
+  mainAG env pwd
 
 
 

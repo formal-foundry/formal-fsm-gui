@@ -1,1 +1,7 @@
-{"port": 3456}
+{"port": 3456,
+ "gpt_key" : "String",
+ "work_dir" : "String",
+ "tChecker_url" : "http://localhost:3030/agda",
+ "tChecker_key" : "not_yet_impelemnted"
+
+}

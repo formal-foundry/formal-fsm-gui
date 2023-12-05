@@ -102,6 +102,12 @@ timestamp = do
   let formatted = formatTime defaultTimeLocale "%H:%M:%S" (posixSecondsToUTCTime current)
   return formatted
 
+timestamp2 :: IO String
+timestamp2 = do
+  current <- getPOSIXTime
+  let formatted = formatTime defaultTimeLocale "%s" $ posixSecondsToUTCTime current
+  return formatted
+
 
 trimPrompt :: [Message] -> [Message]
 trimPrompt ml =
@@ -113,29 +119,29 @@ trimPrompt ml =
 
 
 
-buildProblemList :: PLMonad [Problem]
-buildProblemList = do
-  fromReader <- MR.ask
-  let dirP = snd fromReader
-      inputP = input (fst fromReader)
-      sourceP = source (fst fromReader)
-  case inputP of
-    "problem" -> do
-      problem <-  liftIO $ extractProblem (dirP ++ sourceP ++ ".agda")
-      return [problem]
-    "dir" -> do
-      problemsAL <- liftIO $ dirInspection  (dirP  ++ sourceP ++ "/") []
-      problems <- liftIO $ mapM  extractProblem problemsAL
-      return problems
-    "list" -> do
-      l <- liftIO $ decodeList sourceP
-      let newl  = fmap (\x -> dirP ++ x) l
-      x <- liftIO $ mapM extractProblem newl
-      return x
-    _ ->  do liftIO $ do
-                        cPrint ("Type proper input value\n") Red
-                        putStrLn "--"
-                        die "Something went wrong, try one more time"
+-- buildProblemList :: PLMonad [Problem]
+-- buildProblemList = do
+--   fromReader <- MR.ask
+--   let dirP = snd fromReader
+--       inputP = input (fst fromReader)
+--       sourceP = source (fst fromReader)
+--   case inputP of
+--     "problem" -> do
+--       problem <-  liftIO $ extractProblem (dirP ++ sourceP ++ ".agda")
+--       return [problem]
+--     "dir" -> do
+--       problemsAL <- liftIO $ dirInspection  (dirP  ++ sourceP ++ "/") []
+--       problems <- liftIO $ mapM  extractProblem problemsAL
+--       return problems
+--     "list" -> do
+--       l <- liftIO $ decodeList sourceP
+--       let newl  = fmap (\x -> dirP ++ x) l
+--       x <- liftIO $ mapM extractProblem newl
+--       return x
+--     _ ->  do liftIO $ do
+--                         cPrint ("Type proper input value\n") Red
+--                         putStrLn "--"
+--                         die "Something went wrong, try one more time"
 
 
 type  LString = [String]
@@ -185,7 +191,6 @@ extractProblem fp = do
   let (task, agda, full) = splitProblem readedAFile
   meta <- findMetaD fp
   return $ Problem agda task meta fp full
-
 
 findMetaD :: String -> IO FilePath
 findMetaD fp = do

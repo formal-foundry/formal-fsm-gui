@@ -11,10 +11,11 @@
 
 module Main where
 
+import AgaTypes
 import Types
 import CreateAgda
 
-
+import AgaExtra
 import GHC.Generics
 import Data.Aeson
 import Data.Aeson.Text
@@ -55,22 +56,21 @@ addFrameHeaderC =
   modifyResponse (mapResponseHeaders (("Access-Control-Allow-Headers", "*") :))
 
 
- 
 mainAPI :: FSMEnv -> IO ()
 mainAPI env =do 
   scotty (port env) $ do
     middleware addFrameHeader
     middleware addFrameHeaderA
     middleware addFrameHeaderC
-    middleware $ staticPolicy (noDots >-> addBase "./fsm-web")
+    middleware $ staticPolicy (noDots >-> addBase (work_dir env))
     options (regex "/*")  $ text "Success"
 
     get "/help" $  text  $ TL.fromStrict infoWeb
 
-    post "checkAgda" $ do
+    post "/checkAgda" $ do
       body <- jsonData :: ActionM ReqCheckAgda
-      let test = prompt1 body
-      text $ TL.pack test
+      ts <- liftIO timestamp2
+      text $ TL.pack ts
 
     post "/getAgda" $ do
       body  <- jsonData :: ActionM ReqGetAgda
@@ -93,16 +93,13 @@ main = loadConfigAndRun mainAPI
 loadConfigAndRun :: (FSMEnv  -> IO ()) -> IO ()
 loadConfigAndRun mainAPI =
   do
-  args <- getArgs
-  case args of
-     [configFileName] -> do
-       mbCfg <- decodeFileStrict configFileName :: IO (Maybe FSMEnv)
-       case mbCfg of
-         Nothing ->
-                   Prelude.putStrLn $ "Invalid JSON file format, check : " ++ configFileName
-         Just cfg ->  mainAPI cfg
-     _ ->
-       Prelude.putStrLn $ show args ++  "\n\nInvalid number of arguments, please run the program again with one argument: config.json"
+    home <- getEnv "HOME"
+    let path = home ++"/.fsm/config.json"
+    mbCfg <- decodeFileStrict path :: IO (Maybe FSMEnv)
+    case mbCfg of
+      Nothing ->
+                Prelude.putStrLn $ "Invalid JSON file format, check : " ++  path
+      Just cfg ->  mainAPI cfg
 
 
 infoWeb :: T.Text

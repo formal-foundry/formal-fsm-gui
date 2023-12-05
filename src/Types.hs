@@ -24,7 +24,12 @@ data State s t =  State { transitions :: Map t (Transition s)
 data FSM s t = FSM { states :: Map s (State s t)
                    } 
 
-data FSMEnv = FSMEnv { port :: Int
+data FSMEnv = FSMEnv { port :: Int,
+                       gpt_key :: String,
+                       work_dir :: String,
+                       tChecker_url :: String,
+                       tChecker_key :: String
+
                      } deriving (Show, Generic, ToJSON, FromJSON)
 
 
@@ -38,10 +43,11 @@ data ResponseTC = ResponseTC{ output :: String
                               , status :: Int} deriving (Show,  Generic, ToJSON, FromJSON)
 
 
-data ReqCheckAgda = ReqCheckAgda {agdaCode :: String
+data ReqCheckAgda = ReqCheckAgda
+                    {agdaCode :: String
                     , prompt1 :: String
                     , prompt2 :: String
                     , turns :: Int
-                    , model :: String
+                    , modelR :: String
                     } deriving (Show, Generic, ToJSON, FromJSON)
 
