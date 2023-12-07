@@ -38,15 +38,11 @@ divInit  = div [ style "width" "50%", style "border" "double"]
 
 divF : Model  -> Html Msg
 divF m  =  div [ style "width" "50%", style "border" "double"]
-              [divIMB m, divIIVt m]
+              [divIMB m, divIVR m]
 
 
 divIIVt : Model -> Html Msg
 divIIVt m = div [][]
--- divI : Model ->  Html Msg
--- divI m = div [ style "width" "50%", style "border" "double"]
---              [divMB m, divIV m]
-
 
 divIMB : Model ->  Html Msg
 divIMB m =
@@ -90,13 +86,24 @@ divIMB m =
               ]
 
 
--- -- divIV : Model -> Html Msg
--- divIV m =
---   case m of
---   Init i b -> butChoise b m
---   WaitingForAgdaFile i b x y -> butChoise b m
---   WaitingForAgdaCheck i b x y -> butChoise b m
---   DisplayResults i b x y -> butChoise b m
+divIVR : Model -> Html Msg
+divIVR m =
+  case m of
+  Init i b -> divInit
+  WaitingForAgdaFile _ _ x y -> butChoiseR y x
+  WaitingForAgdaCheck _ _ x y -> butChoiseR y x
+  DisplayResults _ _ x y -> butChoiseR y x
+
+
+butChoiseR : ResButton -> ResChecker -> Html Msg
+butChoiseR b rc =
+  let prefix = .path rc  in
+
+  case b of
+    RGeneral -> div [][text"f"]
+    RCode -> div [][text "c"]
+    Rall -> div [][text "a"]
+
 
 
 

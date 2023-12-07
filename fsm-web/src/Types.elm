@@ -32,6 +32,7 @@ type Msg = Restart
          | Generator Model (Result Http.Error String)
          | Checker Model (Result Http.Error String)
 
+
 type MenuButton = BSchema | BAgda | BP1 | BP2 | BSet
 
 type ResButton  =  RGeneral | RCode | Rall
@@ -161,3 +162,6 @@ The compiler reported the following errors:
 
 Could you please help me fix these errors? Provide any necessary modifications to the existing code or additional Agda code to resol>
   """
+
+server : String
+server = "http://localhost:3456"

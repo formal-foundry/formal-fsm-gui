@@ -179,7 +179,7 @@ getAgda m =
             _ -> "pi"
   in 
         Http.post
-           { url = "http://localhost:3456/getAgda"
+           { url = server ++ "/getAgda"
            , body = Http.jsonBody (JE.object [("schema", JE.string (Base64.encode s)),
                                               ("mode", JE.string mo)])
            , expect = Http.expectString  (Generator m)
@@ -202,7 +202,7 @@ checkAgda m =
 
   in 
         Http.post
-           { url = "http://localhost:3456/checkAgda"
+           { url = server ++ "/checkAgda"
            , body = Http.jsonBody (JE.object
            [("agdaCode", JE.string (Base64.encode  code)),
             ("prompt1", JE.string (Base64.encode p1)),
