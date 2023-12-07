@@ -18,7 +18,7 @@ divI m = div [ style "width" "50%", style "border" "double"]
              [divMB m, divIV m]
 
 
-divMB :Model ->  Html Msg
+divMB : Model ->  Html Msg
 divMB m =
   let
        s = case m of
@@ -90,9 +90,9 @@ divIV : Model -> Html Msg
 divIV m =
   case m of
   Init i b -> butChoise b m
-  WaitingForAgdaFile i b x y -> butChoise b m  
-  WaitingForAgdaCheck i b x y -> butChoise b m 
-  DisplayResults i b x y -> butChoise b m 
+  WaitingForAgdaFile i b x y -> butChoise b m
+  WaitingForAgdaCheck i b x y -> butChoise b m
+  DisplayResults i b x y -> butChoise b m
 
 
 
@@ -178,10 +178,11 @@ p1Div m =
                                        onInput (updatep1 m)]
                                            [text s]]
 
+
 updatep1 : Model -> String -> Msg
 updatep1 m s = case m of
-  WaitingForAgdaCheck i _ _ _  -> UpdateAgda {i | prompt1 = s}
-  DisplayResults i _ _ _-> UpdateAgda {i | prompt1 = s}
+  WaitingForAgdaCheck i _ _ _  -> UpdateP1 {i | prompt1 = s}
+  DisplayResults i _ _ _-> UpdateP1 {i | prompt1 = s}
   _ -> Restart
 
 p2Div : Model -> Html Msg
@@ -211,8 +212,8 @@ p2Div m =
 
 updatep2 : Model -> String -> Msg
 updatep2 m s = case m of
-  WaitingForAgdaCheck i _ _ _  -> UpdateAgda {i | prompt2 = s}
-  DisplayResults i _ _ _-> UpdateAgda {i | prompt2 = s}
+  WaitingForAgdaCheck i _ _ _  -> UpdateP2 {i | prompt2 = s}
+  DisplayResults i _ _ _-> UpdateP2 {i | prompt2 = s}
   _ -> Restart
 
 setDiv : Model -> Html Msg
@@ -261,18 +262,18 @@ setVgpt  s v = {v | gpt = s}
 updateG : Model -> String -> Msg
 updateG m s = case m of
   Init i _ ->  UpdateAM ((setSet <| setVgpt s) i )
-  WaitingForAgdaFile i _ _ _->  UpdateAM ((setSet <| setVgpt s) i )
-  WaitingForAgdaCheck i _ _ _->  UpdateAM ((setSet <| setVgpt s) i )
-  DisplayResults i _ _ _-> UpdateAM ((setSet <| setVgpt s) i )
+  WaitingForAgdaFile i _ _ _->  UpdateG ((setSet <| setVgpt s) i )
+  WaitingForAgdaCheck i _ _ _->  UpdateG ((setSet <| setVgpt s) i )
+  DisplayResults i _ _ _-> UpdateG ((setSet <| setVgpt s) i )
 
 
 updateT : Model -> String -> Msg
 updateT m s  =
   case m of
-  Init i _ ->  UpdateAM ((setSet <| setVturns s) i )
-  WaitingForAgdaFile i _ _ _->  UpdateAM ((setSet <| setVturns s) i )
-  WaitingForAgdaCheck i _ _ _->  UpdateAM ((setSet <| setVturns s) i )
-  DisplayResults i _ _ _-> UpdateAM ((setSet <| setVturns s) i )
+  Init i _ ->  UpdateT ((setSet <| setVturns s) i )
+  WaitingForAgdaFile i _ _ _->  UpdateT ((setSet <| setVturns s) i )
+  WaitingForAgdaCheck i _ _ _->  UpdateT ((setSet <| setVturns s) i )
+  DisplayResults i _ _ _-> UpdateT ((setSet <| setVturns s) i )
 
 checkerSetDiv : Model -> Html Msg
 checkerSetDiv m =

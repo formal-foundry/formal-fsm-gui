@@ -186,10 +186,12 @@ decodeList name  =  do
 
 extractProblem :: String -> IO Problem
 extractProblem fp = do
+  putStrLn fp
+  home <- getEnv "HOME"
   pFile <- check_agda fp
   readedAFile <- liftIO $ readFile pFile
   let (task, agda, full) = splitProblem readedAFile
-  meta <- findMetaD fp
+  let meta = home ++ "/.fsm/Problem.json"
   return $ Problem agda task meta fp full
 
 findMetaD :: String -> IO FilePath

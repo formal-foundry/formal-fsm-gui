@@ -25,16 +25,31 @@ update msg model =
       UpdateAgda i -> (updateDef i model, Cmd.none)
       UpdateP1 i -> (updateDef i model, Cmd.none)
       UpdateP2 i -> (updateDef i model, Cmd.none)
-      UpdateAM i -> (updateDef i model, Cmd.none)
-      UpdateT i ->  (updateDef i model, Cmd.none)
-      UpdateG i ->(updateDef i model, Cmd.none)
+      UpdateAM i -> (updateS i model, Cmd.none)
+      UpdateT i ->  (updateDefq i model, Cmd.none)
+      UpdateG i ->(updateDefq i model, Cmd.none)
       ChangeBookMark b -> (buttonChanger b model, Cmd.none)
+      ChangeBookMarkO b -> (buttonChangerO b model, Cmd.none)
       GenAgda  -> (model, getAgda model)
       CheckAgda -> (model, checkAgda model)
       Generator m res -> (afterGen m res, Cmd.none)
-      Checker m res -> ( Init initInput BSchema, Cmd.none)
+      Checker m res -> (afterChk m res, Cmd.none)
 
 
+afterChk : Model -> (Result Http.Error String) -> Model
+afterChk m r =
+  let nR = buildErrorMessageChk r
+  in
+  case m of
+    Init ei b  -> Init ei b 
+    WaitingForAgdaFile ei b x y-> WaitingForAgdaFile ei b (ru nR) y
+    WaitingForAgdaCheck ei b x y-> WaitingForAgdaCheck ei b (ru nR) y
+    DisplayResults ei b x y -> DisplayResults ei b (ru nR) y
+
+
+ru : (Bool, String) -> ResChecker
+ru (e,p) = { empty  = e,
+          path = p}
 
 afterGen : Model -> (Result Http.Error String) -> Model
 afterGen m r =
@@ -44,13 +59,6 @@ afterGen m r =
     WaitingForAgdaFile ei b x y -> WaitingForAgdaCheck {ei| agdaValue = newA} b x y
     _ -> Init initInput BSchema
 
-afterCheck : Model -> (Result Http.Error ResChecker) -> Model
-afterCheck m r = Init initInput BSchema
---   let newA = buildErrorMessage r
---   in
---   case m of
---     WaitingForAgdaCheck ei b x y -> DisplayResults {ei| agdaValue = newA} b x y 
---     _ -> Init initInput BSchema
 
 -- --
 updateDef : Input -> Model -> Model
@@ -60,6 +68,14 @@ updateDef i m =
      WaitingForAgdaFile ei b x y-> WaitingForAgdaFile i b x y
      WaitingForAgdaCheck ei b x y-> WaitingForAgdaCheck i b x y
      DisplayResults ei b x y -> DisplayResults i b x y
+
+updateDefq : Input -> Model -> Model
+updateDefq i m =
+ case m of
+     Init ei b  -> Init i b 
+     WaitingForAgdaFile ei b x y-> WaitingForAgdaFile i b x y
+     WaitingForAgdaCheck ei b x y-> WaitingForAgdaCheck i b x y
+     DisplayResults ei b x y -> WaitingForAgdaCheck i b x y
 
 
 --
@@ -90,6 +106,13 @@ buttonChanger b m =
    WaitingForAgdaCheck i e x y -> WaitingForAgdaCheck i b x y
    DisplayResults i e x y -> DisplayResults i b x y 
 
+buttonChangerO : ResButton -> Model -> Model
+buttonChangerO b m =
+  case m of
+   Init i x -> Init i x 
+   WaitingForAgdaFile i e x y -> WaitingForAgdaFile i e x y 
+   WaitingForAgdaCheck i e x y -> WaitingForAgdaCheck i e x b
+   DisplayResults i e x y -> DisplayResults i e x b
 
 
  -- ____VIEW ------
@@ -130,7 +153,7 @@ buttonsDiv m =
 
             button [style"font-size" "large", style "padding" "7px", disabled clear, onClick Restart ]
                    [text "Clear"],
-            button [style"font-size" "large", style "padding" "7px", disabled check, onClick Restart]
+            button [style"font-size" "large", style "padding" "7px", disabled check, onClick CheckAgda]
                    [text "Check Agda"]
            ]
 
@@ -158,7 +181,7 @@ getAgda m =
         Http.post
            { url = "http://localhost:3456/getAgda"
            , body = Http.jsonBody (JE.object [("schema", JE.string (Base64.encode s)),
-                                              ("mode", JE.string "pi")])
+                                              ("mode", JE.string mo)])
            , expect = Http.expectString  (Generator m)
            }
 
@@ -181,12 +204,12 @@ checkAgda m =
         Http.post
            { url = "http://localhost:3456/checkAgda"
            , body = Http.jsonBody (JE.object
-           [("agdaCode", JE.string code),
-            ("prompt1", JE.string p1),
-            ("prompt2", JE.string p2),
-            ("turns", JE.string gpt),
-            ("model", JE.string gpt)])
-           , expect = Http.expectJson  (Checker m) resPathsDec
+           [("agdaCode", JE.string (Base64.encode  code)),
+            ("prompt1", JE.string (Base64.encode p1)),
+            ("prompt2", JE.string (Base64.encode p2)),
+            ("turns", JE.int turns),
+            ("modelR", JE.string gpt)])
+           , expect = Http.expectString  (Checker m) 
            }
 
 buildErrorMessage : (Result Http.Error String) -> String
@@ -209,6 +232,31 @@ buildErrorMessage result =
 
                  Http.BadBody message ->
                      message
+
+
+
+buildErrorMessageChk : (Result Http.Error String) -> (Bool ,String)
+buildErrorMessageChk result =
+  case result of
+    Ok s -> (False, s)
+    Err httpError -> 
+             case httpError of
+                 Http.BadUrl message ->
+                     (True, message)
+
+                 Http.Timeout ->
+                     (False, "Server is taking too long to respond. Please try again later.")
+
+                 Http.NetworkError ->
+                     (False, "Unable to reach server.")
+
+                 Http.BadStatus statusCode ->
+                     (False,("Request failed with status code: " ++ String.fromInt statusCode))
+
+                 Http.BadBody message ->
+                     (False, message)
+
+
 
 
 

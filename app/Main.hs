@@ -14,11 +14,22 @@ module Main where
 import AgaTypes
 import Types
 import CreateAgda
-
+import AgaMain
 import AgaExtra
 import GHC.Generics
 import Data.Aeson
 import Data.Aeson.Text
+
+
+import Data.List
+import System.Console.CmdArgs
+import System.Environment (getArgs)
+import System.Process
+import System.Console.ANSI
+import System.Exit
+import System.FilePath (splitFileName)
+import System.Directory
+
 
 import qualified NeatInterpolation as NI(text)
 
@@ -41,6 +52,8 @@ import qualified Network.Wai.Parse as NWP
 import System.Environment
 import Data.Aeson
 import Data.ByteString.Base64.Lazy as B64
+import Control.Concurrent
+
 
 addFrameHeader :: Middleware
 addFrameHeader =
@@ -70,6 +83,8 @@ mainAPI env =do
     post "/checkAgda" $ do
       body <- jsonData :: ActionM ReqCheckAgda
       ts <- liftIO timestamp2
+      liftIO $ preperDirStructure ts env 
+      x <- liftIO $ forkIO $ loadAndR mainAG env (decodeB64 body) ts
       text $ TL.pack ts
 
     post "/getAgda" $ do
@@ -101,6 +116,33 @@ loadConfigAndRun mainAPI =
                 Prelude.putStrLn $ "Invalid JSON file format, check : " ++  path
       Just cfg ->  mainAPI cfg
 
+
+
+preperDirStructure :: String -> FSMEnv  -> IO ()
+preperDirStructure ts e = do
+  setCurrentDirectory (work_dir e)
+  createDirectory ts
+  setCurrentDirectory $ (work_dir e)++"/"++ts
+  appendFile "general.txt" "Waiting for update..."
+  appendFile "code.txt" "Waiting for update..."
+  appendFile "all.txt" "Waiting for update..."
+
+decodeB64 :: ReqCheckAgda -> ReqCheckAgda
+decodeB64 r =
+  ReqCheckAgda
+  {agdaCode = eitherB (agdaCode r)
+  , prompt1 =  eitherB (prompt1 r)
+  , prompt2 =  eitherB (prompt2 r)
+  , turns = turns r
+  , modelR =  modelR r
+  }
+
+
+eitherB :: String -> String
+eitherB s = case B64.decode  ( (TL.encodeUtf8 . TL.pack ) (s)) of
+              Right x  ->( TL.unpack . TL.decodeUtf8 ) x
+              _ -> "empty"
+-- B64.decode  ( (TL.encodeUtf8 . TL.pack ) (schema body))
 
 infoWeb :: T.Text
 infoWeb =  [NI.text|

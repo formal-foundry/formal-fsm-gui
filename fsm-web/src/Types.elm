@@ -26,14 +26,15 @@ type Msg = Restart
          | UpdateT Input
          | UpdateG Input
          | ChangeBookMark MenuButton
+         | ChangeBookMarkO ResButton
          | GenAgda
          | CheckAgda
          | Generator Model (Result Http.Error String)
-         | Checker Model (Result Http.Error ResChecker)
+         | Checker Model (Result Http.Error String)
 
 type MenuButton = BSchema | BAgda | BP1 | BP2 | BSet
 
-type ResButton  =  RGeneral | RA1 | RA2
+type ResButton  =  RGeneral | RCode | Rall
 
 type alias Input = { jsonSchema  : String,
                      agdaValue : String,
@@ -48,20 +49,20 @@ type alias ValS = {codeMode :  String,
                       gpt : String
                   }
 
-type alias ResChecker = { newCode : String,
-                        other : String}
+type alias ResChecker = { empty : Bool,
+                        path : String}
 
 
-resPathsDec : Decoder ResChecker
-resPathsDec =
-  Json.Decode.map2 ResChecker
-    (Json.Decode.field "newCode" Json.Decode.string)
-    (Json.Decode.field "other" Json.Decode.string)
+-- resPathsDec : Decoder ResChecker
+-- resPathsDec =
+--   Json.Decode.map2 ResChecker
+--     (Json.Decode.field "newCode" Json.Decode.string)
+--     (Json.Decode.field "other" Json.Decode.string)
 
 
 resex : ResChecker
-resex = { newCode = "Waiting for AGA ...",
-          other = "some.."}
+resex = { empty  = True,
+          path = "empty_path"}
 
 
 initInput : Input

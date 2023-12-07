@@ -21,6 +21,7 @@ import Control.Concurrent
 
 import Data.List.Utils
 import Data.Word (Word16)
+import Data.ByteString.Base64.Lazy as B64
 
 import Data.List
 import System.Console.CmdArgs
@@ -40,42 +41,19 @@ import System.Environment
 
 import System.IO
 
--- main :: IO ()
--- main = do
---   loadAndR mainAG
-
 
 loadAndR :: (AGEnv  -> String -> IO ()) -> FSMEnv -> ReqCheckAgda -> String -> IO ()
 loadAndR  mainAG fsmE req tsDir= do
-  pwd  <- getEnv "PWD"
-
   let dirN = (work_dir fsmE) ++ tsDir
-  problem <- extractProblem (agdaCode req)
-  setCurrentDirectory (work_dir fsmE)
-  createDirectory tsDir  
-  --     problemlist <- runReaderT buildProblemList (args, (problemsDir c))
-  --     writeFile (pwd++"/aga-log.txt") ( "Aga had  " ++ (show (length problemlist))++ " problems to solved\n\n")
-  --     -- let mainDir = pwd ++ "/aga-exec"
-      --     w16 = intToWord16 (threadsNumbers c) 
-      -- createDirectory $ mainDir
-      -- traverseConcurrently_ (ParN w16) (cAGE mainDir) problemlist
-      -- where
-      --    cAGE dir problem = do
-      --      setCurrentDirectory dir
-      --      let name = case stripPrefix (problemsDir c ++ "Problems/") (nameP problem) of
-      --            Nothing -> "unknow_dir"
-      --            Just x -> x
-      --          nameOfProblemDir = replace "/" "-" (take (length name - 5 )name)
-      --          dirN = dir ++ "/"  ++ nameOfProblemDir
-      --          newAF = "AGA-" ++ "Problem.agda"
-      --      createDirectory dirN
-      --      setCurrentDirectory dirN
-      --      writeFile (dirN++"/Problem.agda") (agdaP problem)
-      --      threadDelay 12453
-      --      copyFile (metaP problem) (dirN++"/Problem.json")
-      --      threadDelay 12453
-      --      copyFile "Problem.agda" "Org-Problem.agda"
-
+  writeFile (dirN++"/Problem.agda") (agdaCode req)
+  putStrLn "fr"
+  putStrLn dirN
+  problem <- extractProblem (dirN++"/Problem.agda")
+  setCurrentDirectory dirN
+  writeFile (dirN++"/gpt_f.txt") (prompt1 req)
+  writeFile (dirN++"/gpt_r.txt") (prompt2 req)
+  threadDelay 12453
+  copyFile "Problem.agda" "Org-Problem.agda"
 
   let  env = AGEnv
         { apiKey = gpt_key fsmE
@@ -86,14 +64,15 @@ loadAndR  mainAG fsmE req tsDir= do
         , fullTask = fulltP problem
         , operationMode = PrettyMode
         , maxTurns = turns req
-        , fGptTemp = prompt1 req
-        , rGptTemp = prompt2 req
+        , fGptTemp = dirN ++ "/gpt_f.txt"
+        , rGptTemp = dirN ++ "/gpt_r.txt"
         , gptModel = modelR req
         , tc_url = tChecker_url fsmE
         , tc_key = tChecker_key fsmE
-        , meta_l = ((work_dir fsmE)++ "/Problem.json")
+        , meta_l = metaP problem
         }
-  mainAG env pwd
+  mainAG env dirN
+
 
 
 
@@ -126,7 +105,6 @@ conversation env cP pwd = do
       clearScreen
       setCursorPosition 0 0
       putStrLn $ "Compilation succeeded in " ++ (show l) ++ " attempts."
-      appendFile (pwd++"/aga-log.txt") ("\n OK " ++ (show l) ++ "    " ++ (dirName env))
       setSGR [Reset]
       putStrLn $ (gpt_res (head state))
       threadDelay 2000000
@@ -134,16 +112,13 @@ conversation env cP pwd = do
 
 initInfo :: AGEnv ->  IO ()
 initInfo env = do
-  clearScreen
-  setCursorPosition 0 0
-  setSGR [(SetColor Foreground Dull Blue)]
-  putStrLn "\n\n\n###############################################"
-  putStrLn "Agda-GPT-Assistant started with the following flags:\n\n"
-  setSGR [Reset]
-  putStrLn $ "TASK:  " ++ (taskDescription env) ++ "\n\n"
-  putStrLn $ "MODE:  " ++ (show (operationMode env)) ++ "\n\n"
-  putStrLn $ "MAX TURN :  " ++ (show (maxTurns env)) ++ "\n\n"
-  putStrLn $ "MODEL:  " ++ (gptModel env) ++ "\n\n"
+  let a = appendFile (dirName env ++ "general.txt")
+
+  a "\n\n\n###############################################"
+  a "Agda-GPT-Assistant started with the following flags:\n\n"
+  a $ "TASK:  " ++ (taskDescription env) ++ "\n\n"
+  a $ "MAX TURN :  " ++ (show (maxTurns env)) ++ "\n\n"
+  a $ "MODEL:  " ++ (gptModel env) ++ "\n\n"
 
 
 intToWord16 :: Int -> Word16
