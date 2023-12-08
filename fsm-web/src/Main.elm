@@ -35,7 +35,6 @@ update msg model =
       Generator m res -> (afterGen m res, Cmd.none)
       Checker m res -> (afterChk m res, Cmd.none)
 
-
 afterChk : Model -> (Result Http.Error String) -> Model
 afterChk m r =
   let nR = buildErrorMessageChk r
