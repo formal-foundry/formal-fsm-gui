@@ -11,6 +11,8 @@ import Html.Attributes exposing (..)
 import Http
 import Browser.Navigation exposing (reload)
 import Base64
+import Time
+import Task
 
 import Json.Encode  as JE  exposing (..)
 import Json.Decode exposing (Decoder, Error(..), decodeString, list, string)
@@ -34,6 +36,8 @@ update msg model =
       CheckAgda -> (model, checkAgda model)
       Generator m res -> (afterGen m res, Cmd.none)
       Checker m res -> (afterChk m res, Cmd.none)
+      UpdateTxt mw x -> (mw, Cmd.none)
+
 
 afterChk : Model -> (Result Http.Error String) -> Model
 afterChk m r =
@@ -42,7 +46,7 @@ afterChk m r =
   case m of
     Init ei b  -> Init ei b 
     WaitingForAgdaFile ei b x y-> WaitingForAgdaFile ei b (ru nR) y
-    WaitingForAgdaCheck ei b x y-> WaitingForAgdaCheck ei b (ru nR) y
+    WaitingForAgdaCheck ei b x y-> DisplayResults ei b (ru nR) y
     DisplayResults ei b x y -> DisplayResults ei b (ru nR) y
 
 
@@ -158,12 +162,13 @@ buttonsDiv m =
 
 headerDiv : Html Msg
 headerDiv = div [ style "display" "flex", style "align-items" "center"]
-          [img [ src "http://localhost:8000/src/ff.jpg", height 150,
+          [img [ src "http://localhost:8000/src/ff.jpg", height 150,          
                  style "display" "inline"] [],
            h1  [ style "text-align" "center" , style "display" "inline",
                    style "margin-inline-start" "220px"]
                [ text "Finite-State Machine - Agda Checker"]
-          ] 
+          ]
+
 
 -- REQUESTS --________________
 
@@ -210,6 +215,7 @@ checkAgda m =
             ("modelR", JE.string gpt)])
            , expect = Http.expectString  (Checker m) 
            }
+
 
 buildErrorMessage : (Result Http.Error String) -> String
 buildErrorMessage result =
@@ -265,10 +271,17 @@ main =
         { init = init
         , view = view
         , update = update
-        , subscriptions = \_ -> Sub.none
+        , subscriptions = sub
         }
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
     ( Init initInput BSchema, Cmd.none )
+
+
+sub : Model -> Sub Msg
+sub m =
+  case m of
+    DisplayResults ei b x y -> Time.every 1100  (UpdateTxt m)
+    _ -> Sub.none

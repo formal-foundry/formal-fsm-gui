@@ -26,7 +26,8 @@ divO m =
     DisplayResults i _ x z -> case  .empty x of
                                     True -> divInit
                                     False -> divF m 
-  
+
+
 
 divInit : Html Msg
 divInit  = div [ style "width" "50%", style "border" "double"]
@@ -40,9 +41,6 @@ divF : Model  -> Html Msg
 divF m  =  div [ style "width" "50%", style "border" "double"]
               [divIMB m, divIVR m]
 
-
-divIIVt : Model -> Html Msg
-divIIVt m = div [][]
 
 divIMB : Model ->  Html Msg
 divIMB m =
@@ -100,8 +98,8 @@ butChoiseR b rc =
   let prefix = .path rc  in
 
   case b of
-    RGeneral -> div [][text"f"]
-    RCode -> div [][text "c"]
+    RGeneral ->  div [] [embed [ src "http://localhost:3456/a.txt"] []]
+    RCode ->  div [] [embed [ src "http://localhost:3456/b.txt"] []]
     Rall -> div [][text "a"]
 
 

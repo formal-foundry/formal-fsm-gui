@@ -7,6 +7,7 @@ import Html.Attributes exposing (..)
 import Http
 import Browser.Navigation exposing (reload)
 import Base64
+import Time
 
 import Json.Encode  as JE  exposing (..)
 import Json.Decode exposing (Decoder, Error(..), decodeString, list, string)
@@ -29,6 +30,7 @@ type Msg = Restart
          | ChangeBookMarkO ResButton
          | GenAgda
          | CheckAgda
+         | UpdateTxt Model Time.Posix
          | Generator Model (Result Http.Error String)
          | Checker Model (Result Http.Error String)
 
@@ -54,6 +56,8 @@ type alias ResChecker = { empty : Bool,
                         path : String}
 
 
+type alias FileSet = {genF : String,
+                      codeF : String}
 -- resPathsDec : Decoder ResChecker
 -- resPathsDec =
 --   Json.Decode.map2 ResChecker
@@ -64,6 +68,8 @@ type alias ResChecker = { empty : Bool,
 resex : ResChecker
 resex = { empty  = True,
           path = "empty_path"}
+
+
 
 
 initInput : Input
