@@ -36,8 +36,13 @@ update msg model =
       CheckAgda -> (model, checkAgda model)
       Generator m res -> (afterGen m res, Cmd.none)
       Checker m res -> (afterChk m res, Cmd.none)
-      UpdateTxt mw x -> (mw, checkGeneral mw)
-      UpdateGeneral m r -> (updateGeneral m r, Cmd.none)
+      UpdateTxt mw x -> (mw, (checkGeneral mw))
+      UpdateGeneral mw r -> (mw, checkCode mw (buildErrorMessage r))
+      UpdateCode mw  gen r  -> (mw, checkAll mw gen (buildErrorMessage r))
+      UpdateAll mw gen code r-> (updateG mw gen code r, Cmd.none)
+
+-- batchList : Model -> Cmd Msg
+-- batchList mw = Cmd.batch [ (checkCode mw), (checkAll mw), (checkGeneral mw)]
 
 
 updateGeneral : Model -> (Result Http.Error String) -> Model
@@ -46,6 +51,33 @@ updateGeneral m r =
    case m of
     DisplayResults ei b x y k-> DisplayResults ei b x y {k | generalS = res}
     _ -> Init initInput BSchema
+
+updateG : Model -> String -> String -> (Result Http.Error String) -> Model
+updateG m gen code r =
+   let res = buildErrorMessage r in
+   case m of
+    DisplayResults ei b x y k-> DisplayResults ei b x y {k | generalS = gen, codeS = code, allS = res }
+    _ -> Init initInput BSchema
+
+
+
+updateCode : Model -> (Result Http.Error String) -> Model
+updateCode m r =
+   let res = buildErrorMessage r in
+   case m of
+    DisplayResults ei b x y k-> DisplayResults ei b x y {k | codeS = res}
+    _ -> Init initInput BSchema
+
+
+
+updateAll : Model -> (Result Http.Error String) -> Model
+updateAll m r =
+   let res = buildErrorMessage r in
+   case m of
+    DisplayResults ei b x y k-> DisplayResults ei b x y {k |allS = "rvrvrere"}
+    _ -> Init initInput BSchema
+
+
 
 
 afterChk : Model -> (Result Http.Error String) -> Model
@@ -171,7 +203,7 @@ buttonsDiv m =
 
 headerDiv : Html Msg
 headerDiv = div [ style "display" "flex", style "align-items" "center"]
-          [img [ src "http://localhost:8000/src/ff.jpg", height 150,          
+          [img [ src ("http://localhost:8000/src/ff.jpg"), height 150,          
                  style "display" "inline"] [],
            h1  [ style "text-align" "center" , style "display" "inline",
                    style "margin-inline-start" "220px"]
@@ -209,9 +241,9 @@ checkAgda m =
       p2 = ni.prompt2
       code = ni.agdaValue
       gpt = ni.setting.gpt
-      turns = case String.toInt ni.setting.gpt of
+      turns = case String.toInt ni.setting.turns of
                 Just int -> int
-                Nothing -> 10
+                Nothing -> 2
 
   in 
         Http.post
@@ -230,16 +262,48 @@ checkAgda m =
 checkGeneral : Model -> Cmd Msg
 checkGeneral m =
   let ni = case m of
-            Init i _ -> i
-            WaitingForAgdaFile i _ _ _ -> i
-            WaitingForAgdaCheck i _ _ _ -> i
-            DisplayResults i _ _ _ _-> i
-      p1 = ni.prompt1
+            Init i _ -> "empty"
+            WaitingForAgdaFile i _ x _ -> .path x
+            WaitingForAgdaCheck i _ x _ -> .path x
+            DisplayResults i _ x _ _-> .path x
   in 
         Http.get
-           { url = server ++ "/a.txt"
+           { url = server ++ "/"++ ni ++ "/general.txt"
            , expect = Http.expectString  (UpdateGeneral m) 
            }
+
+
+
+
+checkCode : Model -> String ->  Cmd Msg
+checkCode m gen=
+  let ni = case m of
+            Init i _ -> "empty"
+            WaitingForAgdaFile i _ x _ -> .path x
+            WaitingForAgdaCheck i _ x _ -> .path x
+            DisplayResults i _ x _ _-> .path x
+  in 
+        Http.get
+           { url = server ++ "/"++ ni ++ "/code.txt"
+           , expect = Http.expectString  (UpdateCode m gen) 
+           }
+
+
+
+checkAll : Model -> String -> String -> Cmd Msg
+checkAll m gen code=
+  let ni = case m of
+            Init i _ -> "empty"
+            WaitingForAgdaFile i _ x _ -> .path x
+            WaitingForAgdaCheck i _ x _ -> .path x
+            DisplayResults i _ x _ _-> .path x
+  in 
+        Http.get
+           { url = server ++ "/"++ ni ++ "/all.txt"
+           , expect = Http.expectString  (UpdateAll m gen code) 
+           }
+
+
 
 
 buildErrorMessage : (Result Http.Error String) -> String
@@ -308,5 +372,5 @@ init _ =
 sub : Model -> Sub Msg
 sub m =
   case m of
-    DisplayResults ei b x y k-> Time.every 2200  (UpdateTxt m)
+    DisplayResults ei b x y k-> Time.every 7000  (UpdateTxt m)
     _ -> Sub.none

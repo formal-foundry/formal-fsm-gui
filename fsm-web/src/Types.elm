@@ -46,6 +46,8 @@ type Msg = Restart
          | Generator Model (Result Http.Error String)
          | Checker Model (Result Http.Error String)
          | UpdateGeneral Model (Result Http.Error String)
+         | UpdateCode Model String (Result Http.Error String)
+         | UpdateAll Model String String (Result Http.Error String)
 
 
 type MenuButton = BSchema | BAgda | BP1 | BP2 | BSet
@@ -96,7 +98,7 @@ initInput = { jsonSchema = ex,
 
 initSet : ValS
 initSet = {codeMode = "pi",
-           turns = "5",
+           turns = "2",
            gpt =  "gpt-3.5-turbo" }
 
 
