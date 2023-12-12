@@ -81,7 +81,7 @@ mainAG env pwd = do
   checkAgdaF <- tryToCompileAPI   (agdaFile env) (meta_l env) (tc_url env)
   case checkAgdaF of
     Just x -> do
-       cPrint  ("Incorrect  agda File:  " ++ (orgAgdaF env) ++ "\n\n" ++ "COMPILER ERROR: " ++ x ) Red
+       appendFile (pwd ++ "/general.txt")  ("\n\nIncorrect  agda File:  " ++ (orgAgdaF env) ++ "\n\n" ++ "COMPILER ERROR: " ++ x )
     Nothing -> do
                initInfo env
                conversation env [] pwd
@@ -98,24 +98,23 @@ conversation env cP pwd = do
         do
           conversation env state pwd
         else do
-        cPrint "Too many attempts, Agda-GPT-Assistan fail. Increase max turn or change agda task for GPT. \n Check logs files." Red
-        appendFile (pwd++"/aga-log.txt") ("\n FAILED " ++ " " ++ (dirName env))
+        appendFile (pwd ++ "/general.txt") ("\n\nToo many attempts, Agda-GPT-Assistan fail. \nIncrease max turn or change agda task for GPT. \n Check logs files.")
+
     Nothing ->do
       setSGR [(SetColor Foreground Dull Green)]
       clearScreen
       setCursorPosition 0 0
-      putStrLn $ "Compilation succeeded in " ++ (show l) ++ " attempts."
+      appendFile (pwd ++ "/general.txt") $ "Compilation succeeded in " ++ (show l) ++ " attempts."
       setSGR [Reset]
-      putStrLn $ (gpt_res (head state))
       threadDelay 2000000
       setSGR [Reset]
 
 initInfo :: AGEnv ->  IO ()
 initInfo env = do
-  let a = appendFile (dirName env ++ "general.txt")
+  let a = appendFile (dirName env ++ "/general.txt")
 
-  a "\n\n\n###############################################"
-  a "Agda-GPT-Assistant started with the following flags:\n\n"
+  a "\n\n##############################"
+  a "\n\nAgda-GPT-Assistant started:\n"
   a $ "TASK:  " ++ (taskDescription env) ++ "\n\n"
   a $ "MAX TURN :  " ++ (show (maxTurns env)) ++ "\n\n"
   a $ "MODEL:  " ++ (gptModel env) ++ "\n\n"
