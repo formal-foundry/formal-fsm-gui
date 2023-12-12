@@ -36,7 +36,16 @@ update msg model =
       CheckAgda -> (model, checkAgda model)
       Generator m res -> (afterGen m res, Cmd.none)
       Checker m res -> (afterChk m res, Cmd.none)
-      UpdateTxt mw x -> (mw, Cmd.none)
+      UpdateTxt mw x -> (mw, checkGeneral mw)
+      UpdateGeneral m r -> (updateGeneral m r, Cmd.none)
+
+
+updateGeneral : Model -> (Result Http.Error String) -> Model
+updateGeneral m r =
+   let res = buildErrorMessage r in
+   case m of
+    DisplayResults ei b x y k-> DisplayResults ei b x y {k | generalS = res}
+    _ -> Init initInput BSchema
 
 
 afterChk : Model -> (Result Http.Error String) -> Model
@@ -46,8 +55,8 @@ afterChk m r =
   case m of
     Init ei b  -> Init ei b 
     WaitingForAgdaFile ei b x y-> WaitingForAgdaFile ei b (ru nR) y
-    WaitingForAgdaCheck ei b x y-> DisplayResults ei b (ru nR) y
-    DisplayResults ei b x y -> DisplayResults ei b (ru nR) y
+    WaitingForAgdaCheck ei b x y-> DisplayResults ei b (ru nR) y exStaticF
+    DisplayResults ei b x y k-> DisplayResults ei b (ru nR) y k
 
 
 ru : (Bool, String) -> ResChecker
@@ -70,7 +79,7 @@ updateDef i m =
      Init ei b  -> Init i b 
      WaitingForAgdaFile ei b x y-> WaitingForAgdaFile i b x y
      WaitingForAgdaCheck ei b x y-> WaitingForAgdaCheck i b x y
-     DisplayResults ei b x y -> DisplayResults i b x y
+     DisplayResults ei b x y k-> DisplayResults i b x y k
 
 updateDefq : Input -> Model -> Model
 updateDefq i m =
@@ -78,7 +87,7 @@ updateDefq i m =
      Init ei b  -> Init i b 
      WaitingForAgdaFile ei b x y-> WaitingForAgdaFile i b x y
      WaitingForAgdaCheck ei b x y-> WaitingForAgdaCheck i b x y
-     DisplayResults ei b x y -> WaitingForAgdaCheck i b x y
+     DisplayResults ei b x y k-> WaitingForAgdaCheck i b x y
 
 
 --
@@ -88,7 +97,7 @@ updateA i m =
        Init ei b -> Init ei b
        WaitingForAgdaFile ei b x y -> WaitingForAgdaFile i b x y
        WaitingForAgdaCheck ei b x y -> WaitingForAgdaCheck i b x y
-       DisplayResults ei b x y -> DisplayResults i b x y 
+       DisplayResults ei b x y k -> DisplayResults i b x y k 
 
 
 
@@ -98,7 +107,7 @@ updateS i m =
      Init ei b -> WaitingForAgdaFile i b  resex RGeneral
      WaitingForAgdaFile ei b x y -> WaitingForAgdaFile i b x y
      WaitingForAgdaCheck ei b x y  -> WaitingForAgdaFile i b x y 
-     DisplayResults ei b x y -> WaitingForAgdaFile i b x y
+     DisplayResults ei b x y k-> WaitingForAgdaFile i b x y 
 
 
 buttonChanger : MenuButton -> Model -> Model
@@ -107,7 +116,7 @@ buttonChanger b m =
    Init i _ -> Init i b
    WaitingForAgdaFile i e x y -> WaitingForAgdaFile i b x y 
    WaitingForAgdaCheck i e x y -> WaitingForAgdaCheck i b x y
-   DisplayResults i e x y -> DisplayResults i b x y 
+   DisplayResults i e x y k-> DisplayResults i b x y k 
 
 buttonChangerO : ResButton -> Model -> Model
 buttonChangerO b m =
@@ -115,7 +124,7 @@ buttonChangerO b m =
    Init i x -> Init i x 
    WaitingForAgdaFile i e x y -> WaitingForAgdaFile i e x y 
    WaitingForAgdaCheck i e x y -> WaitingForAgdaCheck i e x b
-   DisplayResults i e x y -> DisplayResults i e x b
+   DisplayResults i e x y k-> DisplayResults i e x b k
 
 
  -- ____VIEW ------
@@ -140,7 +149,7 @@ buttonsDiv m =
              Init _ _ -> True
              WaitingForAgdaFile _ _ _ _ -> True
              WaitingForAgdaCheck _ _ _ _-> False
-             DisplayResults _ _ _ _-> False
+             DisplayResults _ _ _ _ _-> False
       clear = case m of
              Init _ _ -> True
              _ -> False
@@ -195,7 +204,7 @@ checkAgda m =
             Init i _ -> i
             WaitingForAgdaFile i _ _ _ -> i
             WaitingForAgdaCheck i _ _ _ -> i
-            DisplayResults i _ _ _-> i
+            DisplayResults i _ _ _ _-> i
       p1 = ni.prompt1
       p2 = ni.prompt2
       code = ni.agdaValue
@@ -214,6 +223,22 @@ checkAgda m =
             ("turns", JE.int turns),
             ("modelR", JE.string gpt)])
            , expect = Http.expectString  (Checker m) 
+           }
+
+
+
+checkGeneral : Model -> Cmd Msg
+checkGeneral m =
+  let ni = case m of
+            Init i _ -> i
+            WaitingForAgdaFile i _ _ _ -> i
+            WaitingForAgdaCheck i _ _ _ -> i
+            DisplayResults i _ _ _ _-> i
+      p1 = ni.prompt1
+  in 
+        Http.get
+           { url = server ++ "/a.txt"
+           , expect = Http.expectString  (UpdateGeneral m) 
            }
 
 
@@ -283,5 +308,5 @@ init _ =
 sub : Model -> Sub Msg
 sub m =
   case m of
-    DisplayResults ei b x y -> Time.every 1100  (UpdateTxt m)
+    DisplayResults ei b x y k-> Time.every 2200  (UpdateTxt m)
     _ -> Sub.none

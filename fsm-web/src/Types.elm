@@ -16,7 +16,19 @@ import Json.Decode exposing (Decoder, Error(..), decodeString, list, string)
 type Model = Init Input MenuButton
            | WaitingForAgdaFile Input MenuButton ResChecker ResButton
            | WaitingForAgdaCheck Input MenuButton ResChecker ResButton
-           | DisplayResults Input MenuButton ResChecker ResButton
+           | DisplayResults Input MenuButton ResChecker ResButton StaticF
+
+
+type alias StaticF = { generalS  : String,
+                       codeS : String,
+                      allS :  String
+                     }
+
+exStaticF : StaticF
+exStaticF = { generalS =  "Waiting for Agda Checker...",
+              codeS = "Waiting for Agda Checker...",
+              allS = "Waiting for Agda Checker..."
+             }
 
 type Msg = Restart
          | UpdateSchema Input
@@ -33,6 +45,7 @@ type Msg = Restart
          | UpdateTxt Model Time.Posix
          | Generator Model (Result Http.Error String)
          | Checker Model (Result Http.Error String)
+         | UpdateGeneral Model (Result Http.Error String)
 
 
 type MenuButton = BSchema | BAgda | BP1 | BP2 | BSet

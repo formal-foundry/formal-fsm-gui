@@ -23,7 +23,7 @@ divO m =
     WaitingForAgdaCheck i _ x z -> case  .empty x of
                                     True -> divInit
                                     False -> divF m  
-    DisplayResults i _ x z -> case  .empty x of
+    DisplayResults i _ x z _-> case  .empty x of
                                     True -> divInit
                                     False -> divF m 
 
@@ -51,24 +51,24 @@ divIMB m =
            WaitingForAgdaFile _ _ _ _-> "normal"
            WaitingForAgdaCheck _ _ _ RGeneral -> "bold"
            WaitingForAgdaCheck _ _ _ _-> "normal"
-           DisplayResults _ _ _ RGeneral -> "bold"
-           DisplayResults _ _ _ _-> "normal"
+           DisplayResults _ _ _ RGeneral _ -> "bold"
+           DisplayResults _ _ _ _ _-> "normal"
        c =  case m of
            Init _ _ -> "normal"
            WaitingForAgdaFile _ _ _ RCode -> "bold"
            WaitingForAgdaFile _ _ _ _ -> "normal"
            WaitingForAgdaCheck _ _ _ RCode -> "bold"
            WaitingForAgdaCheck _ _ _ _-> "normal"
-           DisplayResults _ _ _ RCode -> "bold"
-           DisplayResults _ _  _ _-> "normal"
+           DisplayResults _ _ _ RCode _-> "bold"
+           DisplayResults _ _  _ _ _-> "normal"
        a = case m of
            Init _ _ -> "normal"
            WaitingForAgdaFile _ _ _ Rall -> "bold"
            WaitingForAgdaFile _ _ _ _ -> "normal"
            WaitingForAgdaCheck _ _ _ Rall -> "bold"
            WaitingForAgdaCheck _ _ _ _-> "normal"
-           DisplayResults _ _ _ Rall -> "bold"
-           DisplayResults _ _ _ _-> "normal"
+           DisplayResults _ _ _ Rall _ -> "bold"
+           DisplayResults _ _ _ _ _-> "normal"
       
   in 
       div [ style "border-bottom" "double", style "padding-top" "4px"]
@@ -88,19 +88,26 @@ divIVR : Model -> Html Msg
 divIVR m =
   case m of
   Init i b -> divInit
-  WaitingForAgdaFile _ _ x y -> butChoiseR y x
-  WaitingForAgdaCheck _ _ x y -> butChoiseR y x
-  DisplayResults _ _ x y -> butChoiseR y x
+  WaitingForAgdaFile _ _ x y -> butChoiseR y x exStaticF
+  WaitingForAgdaCheck _ _ x y -> butChoiseR y x exStaticF
+  DisplayResults _ _ x y k-> butChoiseR y x k
 
 
-butChoiseR : ResButton -> ResChecker -> Html Msg
-butChoiseR b rc =
+butChoiseR : ResButton -> ResChecker -> StaticF ->  Html Msg
+butChoiseR b rc sf =
   let prefix = .path rc  in
 
   case b of
-    RGeneral ->  div [] [embed [ src "http://localhost:3456/a.txt"] []]
-    RCode ->  div [] [embed [ src "http://localhost:3456/b.txt"] []]
-    Rall -> div [][text "a"]
+    RGeneral ->  div [style "height" "340px"]
+                            [textarea [style "width" "96%",
+                                       style "margin-left" "4px", style "height" "330px"]
+                                           [text (.generalS sf)  ]]
 
-
-
+    RCode -> div [style "height" "340px"]
+                            [textarea [style "width" "96%",
+                                       style "margin-left" "4px", style "height" "330px"]
+                                           [text (.codeS sf)  ]]
+    Rall -> div [style "height" "340px"]
+                            [textarea [style "width" "96%",
+                                       style "margin-left" "4px", style "height" "330px"]
+                                           [text (.allS sf)  ]]

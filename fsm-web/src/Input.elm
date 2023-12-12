@@ -28,8 +28,8 @@ divMB m =
            WaitingForAgdaFile _ _ _ _-> "normal"
            WaitingForAgdaCheck _ BSchema _ _-> "bold"
            WaitingForAgdaCheck _ _ _ _-> "normal"
-           DisplayResults _ BSchema _ _ -> "bold"
-           DisplayResults _ _ _ _-> "normal"
+           DisplayResults _ BSchema _ _ _-> "bold"
+           DisplayResults _ _ _ _ _-> "normal"
        a =  case m of
            Init _ BAgda -> "bold"
            Init _ _ -> "normal"
@@ -37,8 +37,8 @@ divMB m =
            WaitingForAgdaFile _ _ _ _ -> "normal"
            WaitingForAgdaCheck _ BAgda _ _ -> "bold"
            WaitingForAgdaCheck _ _ _ _-> "normal"
-           DisplayResults _ BAgda _ _ -> "bold"
-           DisplayResults _ _  _ _-> "normal"
+           DisplayResults _ BAgda _ _ _ -> "bold"
+           DisplayResults _ _  _ _ _-> "normal"
        p1 = case m of
            Init _ BP1 -> "bold"
            Init _ _ -> "normal"
@@ -46,8 +46,8 @@ divMB m =
            WaitingForAgdaFile _ _ _ _ -> "normal"
            WaitingForAgdaCheck _ BP1 _ _-> "bold"
            WaitingForAgdaCheck _ _ _ _-> "normal"
-           DisplayResults _ BP1 _ _-> "bold"
-           DisplayResults _ _ _ _-> "normal"
+           DisplayResults _ BP1 _ _ _-> "bold"
+           DisplayResults _ _ _ _ _-> "normal"
        p2 = case m of
            Init _ BP2 -> "bold"
            Init _ _ -> "normal"
@@ -55,8 +55,8 @@ divMB m =
            WaitingForAgdaFile _ _ _ _ -> "normal"
            WaitingForAgdaCheck _ BP2 _ _ -> "bold"
            WaitingForAgdaCheck _ _ _ _ -> "normal"
-           DisplayResults _ BP2 _ _-> "bold"
-           DisplayResults _ _ _ _-> "normal"
+           DisplayResults _ BP2 _ _ _-> "bold"
+           DisplayResults _ _ _ _ _-> "normal"
        set = case m of
               Init _ BSet -> "bold"
               Init _ _ -> "normal"
@@ -64,8 +64,8 @@ divMB m =
               WaitingForAgdaFile _ _ _ _-> "normal"
               WaitingForAgdaCheck _ BSet _ _-> "bold"
               WaitingForAgdaCheck _ _ _ _-> "normal"
-              DisplayResults _ BSet _ _-> "bold"
-              DisplayResults _ _ _ _-> "normal"
+              DisplayResults _ BSet _ _ _-> "bold"
+              DisplayResults _ _ _ _ _-> "normal"
   in 
       div [ style "border-bottom" "double", style "padding-top" "4px"]
              [button [ style "padding" "3px", style "border-radius" "0% 20% 0% 0%", style "width" "100px", style "font-weight" s,
@@ -92,7 +92,7 @@ divIV m =
   Init i b -> butChoise b m
   WaitingForAgdaFile i b x y -> butChoise b m
   WaitingForAgdaCheck i b x y -> butChoise b m
-  DisplayResults i b x y -> butChoise b m
+  DisplayResults i b x y _-> butChoise b m
 
 
 
@@ -102,7 +102,7 @@ schemaDiv m =
             Init i _ -> .jsonSchema i
             WaitingForAgdaFile i _ _ _ -> .jsonSchema i
             WaitingForAgdaCheck i _ _ _ -> .jsonSchema i
-            DisplayResults i _ _ _-> .jsonSchema i
+            DisplayResults i _ _ _ _-> .jsonSchema i
   in
     div [style "height" "350px"]
         [div [style "text-align" "center", style "border-bottom" "double",
@@ -118,7 +118,7 @@ updateJson m s = case m of
   Init i _ -> UpdateSchema {i | jsonSchema = s}
   WaitingForAgdaFile i _ _ _-> UpdateSchema {i | jsonSchema = s}
   WaitingForAgdaCheck i _  _ _-> UpdateSchema {i | jsonSchema = s}
-  DisplayResults i _ _ _-> UpdateSchema {i | jsonSchema = s}
+  DisplayResults i _ _ _ _-> UpdateSchema {i | jsonSchema = s}
 
 
 agdaDiv : Model -> Html Msg
@@ -127,7 +127,7 @@ agdaDiv m =
             Init i _ -> .agdaValue i
             WaitingForAgdaFile i _ _ _-> .agdaValue i
             WaitingForAgdaCheck i _ _ _-> .agdaValue i
-            DisplayResults i _ _ _-> .agdaValue i
+            DisplayResults i _ _ _ _-> .agdaValue i
   in
   case m of
     Init _ _ -> div [style "height" "350px"] [text "Waiting For Agda Code ..."]
@@ -139,7 +139,7 @@ agdaDiv m =
          div [][textarea [style "width" "95%", style "margin-left" "4px",
                    style "height" "300px", onInput (updateAgda m)]
                   [text s]] ]
-    DisplayResults _ _ _ _-> div [style "height" "350px"]
+    DisplayResults _ _ _ _ _-> div [style "height" "350px"]
                            [div [style "text-align" "center", style "border-bottom" "double",
               style "font-size" "large"]
              [text "Edit Agda code below"],
@@ -152,7 +152,7 @@ agdaDiv m =
 updateAgda : Model -> String -> Msg
 updateAgda m s = case m of
   WaitingForAgdaCheck i _ _ _ -> UpdateAgda {i | agdaValue = s}
-  DisplayResults i _ _ _-> UpdateAgda {i | agdaValue = s}
+  DisplayResults i _ _ _ _-> UpdateAgda {i | agdaValue = s}
   _ -> Restart
 
 p1Div : Model -> Html Msg
@@ -161,7 +161,7 @@ p1Div m =
             Init i _ -> "Waiting For Agda Code ..."
             WaitingForAgdaFile i _ _ _-> "Waiting For Agda Code ..."
             WaitingForAgdaCheck i _ _ _  -> .prompt1 i
-            DisplayResults i _ _ _-> .prompt1 i
+            DisplayResults i _ _ _ _-> .prompt1 i
   in 
   case m of
   Init _ _ -> div [style "height" "350px"] [text "Waiting For Agda Code ..."]
@@ -172,7 +172,7 @@ p1Div m =
                                   style "margin-left" "4px", style "height" "300px",
                                   onInput (updatep1 m)]
                                            [text s]]
-  DisplayResults i _ _ _-> div [style "height" "350px"]
+  DisplayResults i _ _ _ _-> div [style "height" "350px"]
                             [textarea [style "width" "95%",
                                        style "margin-left" "4px", style "height" "300px",
                                        onInput (updatep1 m)]
@@ -182,7 +182,7 @@ p1Div m =
 updatep1 : Model -> String -> Msg
 updatep1 m s = case m of
   WaitingForAgdaCheck i _ _ _  -> UpdateP1 {i | prompt1 = s}
-  DisplayResults i _ _ _-> UpdateP1 {i | prompt1 = s}
+  DisplayResults i _ _ _ _-> UpdateP1 {i | prompt1 = s}
   _ -> Restart
 
 p2Div : Model -> Html Msg
@@ -191,7 +191,7 @@ p2Div m =
             Init i _ -> "Waiting For Agda Code ..."
             WaitingForAgdaFile i _ _ _-> "Waiting For Agda Code ..."
             WaitingForAgdaCheck i _ _ _ -> .prompt2 i
-            DisplayResults i _ _ _ -> .prompt2 i
+            DisplayResults i _ _ _ _ -> .prompt2 i
   in 
   case m of
   Init _ _ -> div [style "height" "350px"] [text "Waiting For Agda Code ..."]
@@ -202,7 +202,7 @@ p2Div m =
                                   style "margin-left" "4px", style "height" "300px",
                                   onInput (updatep2 m)]
                                            [text s]]]
-  DisplayResults i _ _ _-> div [] [div [style "height" "350px"]
+  DisplayResults i _ _ _ _-> div [] [div [style "height" "350px"]
                             [textarea [style "width" "95%",
                                        style "margin-left" "4px", style "height" "300px",
                                        onInput (updatep2 m)]
@@ -213,7 +213,7 @@ p2Div m =
 updatep2 : Model -> String -> Msg
 updatep2 m s = case m of
   WaitingForAgdaCheck i _ _ _  -> UpdateP2 {i | prompt2 = s}
-  DisplayResults i _ _ _-> UpdateP2 {i | prompt2 = s}
+  DisplayResults i _ _ _ _-> UpdateP2 {i | prompt2 = s}
   _ -> Restart
 
 setDiv : Model -> Html Msg
@@ -225,7 +225,7 @@ agdaSetDiv m =
             Init i _ -> .codeMode (.setting i)
             WaitingForAgdaFile i _ _ _-> .codeMode (.setting i)
             WaitingForAgdaCheck i _ _ _ -> .codeMode (.setting i)
-            DisplayResults i _ _ _-> .codeMode (.setting i)
+            DisplayResults i _ _ _ _-> .codeMode (.setting i)
   in
   div [style "text-align" "center",
                     style "font-size" "large",
@@ -243,7 +243,7 @@ updateAC m s = case m of
   Init i _ ->  UpdateAM ((setSet <| setVmode s) i )
   WaitingForAgdaFile i _ _ _ ->  UpdateAM ((setSet <| setVmode s) i )
   WaitingForAgdaCheck i _ _ _->  UpdateAM ((setSet <| setVmode s) i )
-  DisplayResults i _ _ _ -> UpdateAM ((setSet <| setVmode s) i )
+  DisplayResults i _ _ _ _-> UpdateAM ((setSet <| setVmode s) i )
    -- Init i _ -> UpdateAM { i | setting = (setVmode s (.setting i)) }
 
 setSet : (ValS -> ValS)-> Input -> Input
@@ -264,7 +264,7 @@ updateG m s = case m of
   Init i _ ->  UpdateAM ((setSet <| setVgpt s) i )
   WaitingForAgdaFile i _ _ _->  UpdateG ((setSet <| setVgpt s) i )
   WaitingForAgdaCheck i _ _ _->  UpdateG ((setSet <| setVgpt s) i )
-  DisplayResults i _ _ _-> UpdateG ((setSet <| setVgpt s) i )
+  DisplayResults i _ _ _ _-> UpdateG ((setSet <| setVgpt s) i )
 
 
 updateT : Model -> String -> Msg
@@ -273,7 +273,7 @@ updateT m s  =
   Init i _ ->  UpdateT ((setSet <| setVturns s) i )
   WaitingForAgdaFile i _ _ _->  UpdateT ((setSet <| setVturns s) i )
   WaitingForAgdaCheck i _ _ _->  UpdateT ((setSet <| setVturns s) i )
-  DisplayResults i _ _ _-> UpdateT ((setSet <| setVturns s) i )
+  DisplayResults i _ _ _ _-> UpdateT ((setSet <| setVturns s) i )
 
 checkerSetDiv : Model -> Html Msg
 checkerSetDiv m =
@@ -281,7 +281,7 @@ checkerSetDiv m =
             Init i _ -> i
             WaitingForAgdaFile i _ _ _  -> i
             WaitingForAgdaCheck i _ _ _ -> i
-            DisplayResults i _ _ _-> i
+            DisplayResults i _ _ _ _-> i
         k = .gpt (.setting inp)
         it = .turns (.setting inp)
   in
