@@ -60,8 +60,8 @@ loadAndR  mainAG fsmE req tsDir= do
         , orgAgdaF = dirN ++ "/Org-Problem.agda"
         , dirName = dirN
         , agdaFile = dirN ++ "/Problem.agda"
-        , taskDescription = taskP problem
-        , fullTask = fulltP problem
+        , taskDescription = goalR req
+        , fullTask = goalR req
         , operationMode = PrettyMode
         , maxTurns = turns req
         , fGptTemp = dirN ++ "/gpt_f.txt"
@@ -104,7 +104,7 @@ conversation env cP pwd = do
       setSGR [(SetColor Foreground Dull Green)]
       clearScreen
       setCursorPosition 0 0
-      appendFile (pwd ++ "/general.txt") $ "Compilation succeeded in " ++ (show l) ++ " attempts."
+      appendFile (pwd ++ "/general.txt") $ "\nCompilation succeeded in " ++ (show l) ++ " attempts."
       setSGR [Reset]
       threadDelay 2000000
       setSGR [Reset]
@@ -115,9 +115,9 @@ initInfo env = do
 
   a "\n\n##############################"
   a "\n\nAgda-GPT-Assistant started:\n"
-  a $ "TASK:  " ++ (taskDescription env) ++ "\n\n"
-  a $ "MAX TURN :  " ++ (show (maxTurns env)) ++ "\n\n"
-  a $ "MODEL:  " ++ (gptModel env) ++ "\n\n"
+  a $ "TASK: \n " ++ (taskDescription env) ++ "\n"
+  a $ "MAX TURN :  " ++ (show (maxTurns env)) ++ "\n"
+  a $ "MODEL:  " ++ (gptModel env) ++ "\n"
 
 
 intToWord16 :: Int -> Word16

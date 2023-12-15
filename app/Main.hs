@@ -124,8 +124,8 @@ preperDirStructure ts e = do
   createDirectory ts
   setCurrentDirectory $ (work_dir e)++"/"++ts
   appendFile "general.txt" "Waiting for update..."
-  appendFile "code.txt" "Waiting for update..."
-  appendFile "all.txt" "Waiting for update..."
+  appendFile "code.txt" "Waiting for update...\n"
+  appendFile "all.txt" "Waiting for update...\n"
 
 decodeB64 :: ReqCheckAgda -> ReqCheckAgda
 decodeB64 r =
@@ -135,6 +135,7 @@ decodeB64 r =
   , prompt2 =  eitherB (prompt2 r)
   , turns = turns r
   , modelR =  modelR r
+  , goalR = eitherB (goalR r)
   }
 
 

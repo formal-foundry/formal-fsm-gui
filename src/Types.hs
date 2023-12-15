@@ -49,5 +49,6 @@ data ReqCheckAgda = ReqCheckAgda
                     , prompt2 :: String
                     , turns :: Int
                     , modelR :: String
+                    , goalR :: String
                     } deriving (Show, Generic, ToJSON, FromJSON)
 

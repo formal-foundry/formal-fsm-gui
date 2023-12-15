@@ -128,19 +128,13 @@ debugMode = do
       sl = L.length state
       agdafile =  (agdaFile env)
       a_log = (dir++"/agda.log")
-      gA_log = (dir++"/all_gpt.log")
-      gC_log = (dir++"/code_gpt.log")
-      only_code = ("state_code_gpt.log")
+      gA_log = (dir++"/all.txt")
+      gC_log = (dir++"/code.txt")
+      only_code = ("code.log")
       r = "\n\nREASPONSE: \n"
       p = "\n\nPROMPT: \n"
       at_info = "############## Attempt number:  " ++ show (sl+1) ++ " ##############"
       firstPrompt = Message {role = "system", content = "You are a helpful assistant."}
-  -- case mode of
-  --   PrettyMode -> do
-  --     return ()
-  --   DebugMode -> do
-  --     liftIO $ return ()
-
 
   if sl == 0
   then
@@ -152,7 +146,7 @@ debugMode = do
 
       contentAfile <- liftIO $ readFile agdafile
       liftIO $ appendFile a_log  "#########################  Initial data  #########################\n\n"
-      liftIO $ appendFile a_log  contentAfile
+      -- liftIO $ appendFile a_log  contentAfile
       fcon <- liftIO $ fConvInput env
       -- liftIO $ cPrint "The following prompt has been sent to GPT chat\n\n" Yellow
       -- liftIO $ putStrLn $ fcon ++ "\n\n"
@@ -176,9 +170,9 @@ debugMode = do
       newAfile <- liftIO $ readFile agdafile
       -- liftIO  $ writeFile only_code  at_info
       -- liftIO $ appendFile only_code (fst answareFromGPT)
-      liftIO  $ appendFile a_log  at_info
-      liftIO $ appendFile a_log ("\n\n" ++newAfile)
-      -- case mode of
+      -- liftIO  $ appendFile a_log  at_info
+      -- liftIO $ appendFile a_log ("\n\n" ++newAfile)
+      -- -- case mode of
       --   DebugMode -> do
       --     liftIO $ putStrLn $ snd answareFromGPT ++ "\n\n"
       --     liftIO $ setSGR [SetConsoleIntensity BoldIntensity]
