@@ -5,7 +5,7 @@ Program Installation and Configuration Guide
 Prerequisites
 Before proceeding with the installation, ensure that you have the following prerequisites installed on your system:
 
-Git
+Git,
 Stack
 
 
