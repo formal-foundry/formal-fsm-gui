@@ -25,6 +25,7 @@ update msg model =
       Restart -> (Init initInput BSchema, reload)
       UpdateSchema i -> (updateS i model, Cmd.none)
       UpdateAgda i -> (updateDef i model, Cmd.none)
+      UpdateGoal i -> (updateDef i model, Cmd.none)
       UpdateP1 i -> (updateDef i model, Cmd.none)
       UpdateP2 i -> (updateDef i model, Cmd.none)
       UpdateAM i -> (updateS i model, Cmd.none)
@@ -40,9 +41,6 @@ update msg model =
       UpdateGeneral mw r -> (mw, checkCode mw (buildErrorMessage r))
       UpdateCode mw  gen r  -> (mw, checkAll mw gen (buildErrorMessage r))
       UpdateAll mw gen code r-> (updateG mw gen code r, Cmd.none)
-
--- batchList : Model -> Cmd Msg
--- batchList mw = Cmd.batch [ (checkCode mw), (checkAll mw), (checkGeneral mw)]
 
 
 updateGeneral : Model -> (Result Http.Error String) -> Model
@@ -145,7 +143,7 @@ updateS i m =
 buttonChanger : MenuButton -> Model -> Model
 buttonChanger b m =
   case m of
-   Init i _ -> Init i b
+   Init i g -> Init i b
    WaitingForAgdaFile i e x y -> WaitingForAgdaFile i b x y 
    WaitingForAgdaCheck i e x y -> WaitingForAgdaCheck i b x y
    DisplayResults i e x y k-> DisplayResults i b x y k 
@@ -238,6 +236,7 @@ checkAgda m =
             WaitingForAgdaCheck i _ _ _ -> i
             DisplayResults i _ _ _ _-> i
       p1 = ni.prompt1
+      goal = ni.goal
       p2 = ni.prompt2
       code = ni.agdaValue
       gpt = ni.setting.gpt
@@ -253,7 +252,8 @@ checkAgda m =
             ("prompt1", JE.string (Base64.encode p1)),
             ("prompt2", JE.string (Base64.encode p2)),
             ("turns", JE.int turns),
-            ("modelR", JE.string gpt)])
+            ("modelR", JE.string gpt),
+            ("goalR", JE.string (Base64.encode goal))])
            , expect = Http.expectString  (Checker m) 
            }
 

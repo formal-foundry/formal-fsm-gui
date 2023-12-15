@@ -66,6 +66,18 @@ divMB m =
               WaitingForAgdaCheck _ _ _ _-> "normal"
               DisplayResults _ BSet _ _ _-> "bold"
               DisplayResults _ _ _ _ _-> "normal"
+
+       goal = case m of
+                Init _ BGoal -> "bold"
+                Init _ _ -> "normal"
+                WaitingForAgdaFile _ BGoal _ _-> "bold"
+                WaitingForAgdaFile _ _ _ _-> "normal"
+                WaitingForAgdaCheck _ BGoal _ _-> "bold"
+                WaitingForAgdaCheck _ _ _ _-> "normal"
+                DisplayResults _ BGoal _ _ _-> "bold"
+                DisplayResults _ _ _ _ _-> "normal"
+
+
   in 
       div [ style "border-bottom" "double", style "padding-top" "4px"]
              [button [ style "padding" "3px", style "border-radius" "0% 20% 0% 0%", style "width" "100px", style "font-weight" s,
@@ -74,6 +86,9 @@ divMB m =
                button [ style "padding" "3px",  style "border-radius" "0% 20% 0% 0%", style "width" "100px",  style "font-weight" a,
                        onClick (ChangeBookMark BAgda)]
                       [ text "Agda_code"],
+               button [ style "padding" "3px",  style "border-radius" "0% 20% 0% 0%", style "width" "100px",  style "font-weight" goal,
+                       onClick (ChangeBookMark BGoal)]
+                      [ text "Agda_goal"],
                button [ style "padding" "3px",  style "border-radius" "0% 20% 0% 0%", style "width" "100px",  style "font-weight" p1,
                        onClick (ChangeBookMark BP1)]
                       [ text "Prompt_1"],
@@ -154,6 +169,45 @@ updateAgda m s = case m of
   WaitingForAgdaCheck i _ _ _ -> UpdateAgda {i | agdaValue = s}
   DisplayResults i _ _ _ _-> UpdateAgda {i | agdaValue = s}
   _ -> Restart
+
+
+
+goalDiv : Model -> Html Msg
+goalDiv m =
+  let sw = case m of
+            Init i _ -> .goal i
+            WaitingForAgdaFile i _ _ _-> .goal i
+            WaitingForAgdaCheck i _ _ _-> .goal i
+            DisplayResults i _ _ _ _-> .goal i
+  in
+  case m of
+    Init _ _ -> div [style "height" "351px"] [text "Insert Agda goal to resolve"]
+    WaitingForAgdaFile _ _ _ _ -> div [style "height" "351px"] [text "Insert Agda goal to resolve"]
+    WaitingForAgdaCheck _ _ _ _ ->div [style "height" "351px"]
+        [div [style "text-align" "center", style "border-bottom" "double",
+              style "font-size" "large"]
+             [text "Insert Agda goal to resolve"],
+         div [] [div [][textarea [style "width" "94%", style "margin-left" "4px",
+                   style "height" "301px", onInput (updateGoal m)]
+                  [text sw]] ]]
+    DisplayResults _ _ _ _ _-> div [style "height" "351px"]
+                           [div [style "text-align" "center", style "border-bottom" "double",
+              style "font-size" "large"]
+             [text "Insert Agda goal to resolve"],
+        div [] [div [] [textarea [style "width" "94%", style "margin-left" "4px",
+                   style "height" "301px", onInput (updateGoal m)]
+                  [text sw]] ]]
+
+
+
+
+
+updateGoal : Model -> String -> Msg
+updateGoal m s = case m of
+  WaitingForAgdaCheck i _ _ _ -> UpdateGoal {i | goal = s}
+  DisplayResults i _ _ _ _-> UpdateGoal {i | goal = s}
+  _ -> Restart
+
 
 p1Div : Model -> Html Msg
 p1Div m =
@@ -244,7 +298,6 @@ updateAC m s = case m of
   WaitingForAgdaFile i _ _ _ ->  UpdateAM ((setSet <| setVmode s) i )
   WaitingForAgdaCheck i _ _ _->  UpdateAM ((setSet <| setVmode s) i )
   DisplayResults i _ _ _ _-> UpdateAM ((setSet <| setVmode s) i )
-   -- Init i _ -> UpdateAM { i | setting = (setVmode s (.setting i)) }
 
 setSet : (ValS -> ValS)-> Input -> Input
 setSet fn i  = {i | setting = fn i.setting } 
@@ -306,5 +359,6 @@ butChoise b m = case b of
   BP1 -> p1Div m
   BP2 -> p2Div m
   BSet -> setDiv m
+  BGoal -> goalDiv m 
 
 

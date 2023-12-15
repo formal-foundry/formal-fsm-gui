@@ -33,6 +33,7 @@ exStaticF = { generalS =  "Waiting for Agda Checker...",
 type Msg = Restart
          | UpdateSchema Input
          | UpdateAgda Input
+         | UpdateGoal Input
          | UpdateP1 Input
          | UpdateP2 Input
          | UpdateAM Input
@@ -50,7 +51,7 @@ type Msg = Restart
          | UpdateAll Model String String (Result Http.Error String)
 
 
-type MenuButton = BSchema | BAgda | BP1 | BP2 | BSet
+type MenuButton = BSchema | BAgda |BGoal | BP1 | BP2 | BSet
 
 type ResButton  =  RGeneral | RCode | Rall
 
@@ -59,7 +60,8 @@ type alias Input = { jsonSchema  : String,
                      prompt1 :  String,
                      prompt2 :  String,
                      checkerRes : Maybe String,
-                     setting : ValS
+                     setting : ValS,
+                     goal : String
                    }
 
 type alias ValS = {codeMode :  String,
@@ -93,7 +95,9 @@ initInput = { jsonSchema = ex,
               prompt1 = exp1,
               prompt2 = exp2,
               checkerRes = Nothing,
-              setting = initSet }
+              setting = initSet,
+              goal = goalex
+            }
 
 
 initSet : ValS
@@ -102,11 +106,23 @@ initSet = {codeMode = "pi",
            gpt =  "gpt-3.5-turbo" }
 
 
+goalex : String
+goalex = """exist : Σ State Input
+exist = idle , insertCoin
+
+exist :  Σ State Input
+exist = {!!}
+
+dispenseWithoutPayImpossible : ∀ {input} →
+update idle input ≡ dispensing → ⊥
+
+dispenseWithoutPayImpossible {insertCoin} ()
+"""
+
 
 
 ex : String
-ex ="""
-{
+ex ="""{
   "id": "New Machine",
   "initial": "idle",
   "states": {
@@ -150,9 +166,7 @@ ex ="""
 
 
 exp1 : String
-exp1 =
-   """
-Task: Implement a function with the following type signature in Agda:
+exp1 ="""Task: Implement a function with the following type signature in Agda:
 
 {function_type}
 
@@ -171,9 +185,7 @@ Do not duplicate my code, always print only the code that I need to add at the e
 
 
 exp2 : String
-exp2 =
-  """
-Hi GPT, I tried implementing the function using the code you provided, but I encountered some errors during compilation. Here's the >
+exp2 ="""Hi GPT, I tried implementing the function using the code you provided, but I encountered some errors during compilation. Here's the >
 
 {agda_code_with_changes}
 
