@@ -76,6 +76,7 @@ mainAPI env =do
     middleware addFrameHeaderA
     middleware addFrameHeaderC
     middleware $ staticPolicy (noDots >-> addBase (work_dir env))
+    middleware $ staticPolicy (noDots >-> addBase ("./fsm-web"))
     options (regex "/*")  $ text "Success"
 
     get "/help" $  text  $ TL.fromStrict infoWeb

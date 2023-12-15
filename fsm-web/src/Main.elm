@@ -201,7 +201,7 @@ buttonsDiv m =
 
 headerDiv : Html Msg
 headerDiv = div [ style "display" "flex", style "align-items" "center"]
-          [img [ src ("http://localhost:8000/src/ff.jpg"), height 150,          
+          [img [ src ("./ff.jpg"), height 150,          
                  style "display" "inline"] [],
            h1  [ style "text-align" "center" , style "display" "inline",
                    style "margin-inline-start" "220px"]
