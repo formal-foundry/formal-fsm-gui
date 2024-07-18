@@ -1,16 +1,14 @@
-# fsm-agda 
+# formal-fsm-gui 
 Finite State Machine - Agda 
 
 Program Installation and Configuration Guide
 Prerequisites
 Before proceeding with the installation, ensure that you have the following prerequisites installed on your system:
 
-Git,
 Stack
 
-
 Step 1: Clone and Run the Program
-Clone the program repository from the following link: https://github.com/nieradkokrystian/agda-typecheck-web,
+Clone the program repository from the following link:https://github.com/formal-foundry/agda-web-api
 navigate to the cloned repository and read README instruction.
 
 Step 2: Create Necessary Directories and Configuration Files
