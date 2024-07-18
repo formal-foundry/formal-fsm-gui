@@ -1,6 +1,6 @@
-name:                fsm-agda
+name:                formal-fsm-gui
 version:             0.1.0.0
-github:              "githubuser/fsm-agda"
+github:              "githubuser/formal-fsm-gui"
 license:             BSD-3-Clause
 author:              "Author name here"
 maintainer:          "example@example.com"
@@ -17,7 +17,7 @@ extra-source-files:
 # To avoid duplicated efforts in documentation and dealing with the
 # complications of embedding Haddock markup inside cabal files, it is
 # common to point users to the README.md file.
-description:         Please see the README on GitHub at <https://github.com/githubuser/fsm-agda#readme>
+description:         Please see the README on GitHub at <https://github.com/githubuser/formal-fsm-gui#readme>
 
 dependencies:
 - base >= 4.7 && < 5
@@ -68,7 +68,7 @@ library:
   source-dirs: src
 
 executables:
-  fsm-agda-exe:
+  formal-fsm-gui:
     main:                Main.hs
     source-dirs:         app
     ghc-options:
@@ -76,10 +76,10 @@ executables:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - fsm-agda
+    - formal-fsm-gui
 
 tests:
-  fsm-agda-test:
+  fsm:
     main:                Spec.hs
     source-dirs:         test
     ghc-options:
@@ -87,4 +87,4 @@ tests:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - fsm-agda
+    - formal-fsm-gui
