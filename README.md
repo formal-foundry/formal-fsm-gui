@@ -46,10 +46,10 @@ bash
 
 Step 7: Access the Web Interface
 If you haven't changed the port in the configuration file, the web interface will be available at:
-http://localhost:8011/index.html
+http://localhost:3456/index.html
 
 
 
 
-In case of any questions or doubts, please write to krystian.nieradko@gmail.com.
+In case of any questions or doubts, please write to info@formalfoundry.ai
 
