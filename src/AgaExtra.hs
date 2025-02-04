@@ -114,9 +114,10 @@ trimPrompt ml =
   let l = L.length ml in 
   if (L.length ml) <= 10 then ml
   else
-    let (p1:p2:x)= ml in
-      p1 : p2 : (L.drop (l - 6) ml)
-
+    case ml of  
+      (p1:p2:x) ->
+            p1 : p2 : (L.drop (l - 6) ml)
+      _ -> ml
 
 
 -- buildProblemList :: PLMonad [Problem]
@@ -216,5 +217,3 @@ splitProblem :: String -> (String, String, String)
 splitProblem file =
   let list@(x:z:r) =( L.reverse . S.lines) file in
   (z,((S.unlines . L.reverse) r), (z ++ "\n" ++ x))
-
-

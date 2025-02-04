@@ -50,7 +50,7 @@ dependencies:
 - time >= 1.11.1.1
 - MissingH
 - scheduler
-
+- lens
 
 
 ghc-options:

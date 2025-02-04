@@ -77,8 +77,6 @@ instance ToJSON Message where
   toJSON (Message role content) = A.object ["role" .= role, "content" .= content]
 
 
-
-
 data OperationMode =  PrettyMode |  DebugMode
   deriving (Show)
 
