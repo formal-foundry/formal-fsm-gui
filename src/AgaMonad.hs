@@ -1,3 +1,4 @@
+{-# LANGUAGE NondecreasingIndentation #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# OPTIONS_GHC -fno-warn-unused-matches #-}
@@ -68,15 +69,13 @@ $(makeLenses ''AgaENV)
 $(makeLenses ''AgaOutput)
 
 runAgaCmd :: StepCmd -> AgaMonad eT oT sT AgaMsg
-runAgaCmd  (LLMReq t) = do
-  let llmRes = "llm respons"
+runAgaCmd  (LLMReq t) = do 
   model <- view llmModel
   key <- view apiKey
   conv <- use conversation 
   liftIO $ do
-
-    -- ? %= ?
-    return (LLMRes llmRes)
+    llmRes <-  gptConv  (T.unpack model) conv (T.unpack key) 
+    return (LLMRes (T.pack llmRes))
 
 runAgaCmd  (TCReq ac) = do
   let tcRes = TCSucces
