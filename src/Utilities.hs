@@ -9,7 +9,7 @@ module Utilities where
 
 import AgaTypes
 -- import AgaExtra
-import AgdaApi
+-- import AgdaApi
 
 import Control.Monad.Trans.RWS
 import Control.Monad.IO.Class (liftIO)
@@ -30,7 +30,16 @@ import System.Environment (getEnv)
 import Network.HTTP.Client as NC
 import Network.HTTP.Client.TLS (tlsManagerSettings)
 import Network.HTTP.Types.Status
+import Network.HTTP.Client.MultipartFormData
+
+import Data.Text.Lazy             as TL
+import Data.Text.Lazy.Encoding    as TL
+import Data.Text.Lazy.IO          as TL
+
 import Data.Text as T
+import Data.Text.Encoding    as T
+import Data.Text.IO          as T
+
 
 import Control.Concurrent
 
@@ -65,7 +74,7 @@ rmSubS substr str = go str
           | substr `L.isPrefixOf` s = L.drop (L.length substr) s
           | otherwise = x : go xs
 
-fConvInput :: Text -> Text -> Text -> Text
+fConvInput :: T.Text -> T.Text -> T.Text -> T.Text
 fConvInput nld tmpl dp =
     let x1 = replaceText (T.unpack tmpl) "{nld}" (T.unpack nld) 
         x2 = replaceText  x1 "{dp}" (T.unpack dp)
@@ -134,3 +143,11 @@ decodeRes r = case ((A.decode r ):: Maybe ChatCompletion ) of
                      Just x -> content $ message $ Prelude.head $ choices x
 
 
+metaAgda :: B.ByteString
+metaAgda = T.encodeUtf8 . T.pack $
+  "{\"agdaVersion\": \"2.6.4\"dependencies\": []}"
+
+-- {
+--   "agdaVersion": "2.6.4",
+--   "dependencies": []
+-- }

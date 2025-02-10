@@ -19,12 +19,26 @@ import qualified AgaTypes  as AT
 import Control.Lens hiding (element)
 import Control.Lens.TH
 import Data.Text as T
+import Data.Text.Encoding as T
+import Data.Text.IO as T
 import Control.Monad.Trans.RWS
 import Control.Monad.Reader
 import Control.Concurrent
 import System.Environment
 import Data.Text
 import System.IO
+
+import qualified Data.Aeson as A
+import qualified Data.List as L
+import qualified Data.ByteString.Char8 as B
+import qualified Data.ByteString.Lazy.Char8 as BL
+
+
+import Network.HTTP.Client as NC
+import Network.HTTP.Client.TLS (tlsManagerSettings)
+import Network.HTTP.Types.Status
+import Network.HTTP.Client.MultipartFormData
+
 
 data StepCmd = LLMReq Text | TCReq AgdaCode | UserReq Text
 
@@ -48,7 +62,8 @@ data AgaState sT = AgaState { _taskState :: sT
                             }
 
 data AgaENV eT = AgaENV { _taskEnv :: eT
-                        , _apiKey :: Text
+                        , _apiGptKey :: Text
+                        , _tcUrl :: Text
                         , _llmModel :: Text
                         }
 
@@ -69,17 +84,20 @@ $(makeLenses ''AgaENV)
 $(makeLenses ''AgaOutput)
 
 runAgaCmd :: StepCmd -> AgaMonad eT oT sT AgaMsg
-runAgaCmd  (LLMReq t) = do 
+runAgaCmd  (LLMReq t) = do
   model <- view llmModel
-  key <- view apiKey
-  conv <- use conversation 
+  key <- view apiGptKey
+  conv <- use conversation
   liftIO $ do
     llmRes <-  gptConv  (T.unpack model) conv (T.unpack key) 
     return (LLMRes (T.pack llmRes))
 
 runAgaCmd  (TCReq ac) = do
-  let tcRes = TCSucces
-  return (TCRes tcRes)
+  tcUrl <- view tcUrl
+  liftIO $ do
+    tcRes <- tryToCompileAPI ac metaAgda tcUrl
+    return (TCRes tcRes)
+
 
 runAgaCmd  (UserReq t) =  do
   let usRes = "user respons"
@@ -99,6 +117,40 @@ runAgaTask at ae = fmap (\(_, ao ) -> fmap (\x -> x ^.taskOutput)  ao )
 
     -- atm :: AgaMonad eT oT sT ()
     atm =( at ^. firstStep) >>= atLoop
+
+
+
+
+
+tryToCompileAPI :: AgdaCode -> B.ByteString -> Text -> IO TCMsg
+tryToCompileAPI agda meta  url = do
+  manager <- newManager defaultManagerSettings
+  initialRequest <- parseRequest $ T.unpack url
+  let
+    request = initialRequest { method = "POST"}
+    partList = case agda of
+      AgdaSource tx -> [ partBS "Problem.agda" $  T.encodeUtf8 tx
+                       , partBS "Problem.json"  meta
+                       ]
+      AgdaFile fp -> [ partFile "Problem.agda" fp
+                     , partBS "Problem.json"  meta
+                     ]
+
+  req <- formDataBody partList request
+  response <- httpLbs req manager
+  res  <- dec $ responseBody response
+  return $ res
+
+
+dec :: BL.ByteString -> IO TCMsg
+dec re = do
+  let r = A.decode re :: Maybe AT.ResponseApi
+  case r of
+    Nothing -> return $ TCErr "No API respons"
+    Just x -> do
+      case AT.status x of
+        0 -> return TCSucces
+        _ -> return $ TCErr $ T.pack (AT.output x)
 
 
 -- -- --------------------------------------
@@ -122,8 +174,6 @@ $(makeLenses ''TrEnv)
 $(makeLenses ''TrState)
 
 data TrMsg = ClrReq | TypeCheckCandidate AgdaCode |  NlTypeReq | SubmitNlTypeReq | UserAcpetanceReq | Done
-
-
 
 
 
@@ -187,5 +237,5 @@ typeRefiner = AgaTask { _firstStep = fs
 
 
 
-
+-- ---- Utilities -- dependecies problem 
 

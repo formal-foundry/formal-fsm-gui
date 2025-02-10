@@ -9,7 +9,7 @@ import GHC.Generics
 import Data.Aeson
 import Data.Aeson.Text
 import Data.ByteString.Lazy as BSL
-
+import Data.ByteString as BS
 import Data.Text as T
 import Data.Text.Lazy as TL
 
@@ -51,4 +51,8 @@ data ReqCheckAgda = ReqCheckAgda
                     , modelR :: String
                     , goalR :: String
                     } deriving (Show, Generic, ToJSON, FromJSON)
+
+
+metaEx :: BS.ByteString
+metaEx = BS.pack $ "{\n  \"agdaVersion\": \"2.6.4\",\n  \"dependencies\": []\n}"
 

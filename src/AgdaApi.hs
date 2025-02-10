@@ -34,9 +34,6 @@ import Network.HTTP.Client.MultipartFormData
 import Control.Concurrent
 
 
-
-
-
 tryToCompileAPI :: String -> String -> String -> IO (Maybe String)
 tryToCompileAPI agda meta  url = do
   manager <- newManager defaultManagerSettings
