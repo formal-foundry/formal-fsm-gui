@@ -29,9 +29,13 @@ library
       AgaGpt
       AgaMain
       AgaMonad
+      AgaMonad2
       AgaTypes
       AgdaApi
       CreateAgda
+      LLMParser
+      LLMParserTest
+      TypeRefiner
       Types
       Utilities
   other-modules:
@@ -61,6 +65,7 @@ library
     , neat-interpolation
     , process
     , regex-posix
+    , regex-tdfa
     , scheduler
     , scotty
     , split
@@ -104,6 +109,7 @@ executable formal-fsm-gui
     , neat-interpolation
     , process
     , regex-posix
+    , regex-tdfa
     , scheduler
     , scotty
     , split
@@ -148,6 +154,7 @@ test-suite fsm
     , neat-interpolation
     , process
     , regex-posix
+    , regex-tdfa
     , scheduler
     , scotty
     , split
