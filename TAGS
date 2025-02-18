@@ -1,0 +1,383 @@
+
+./Setup.hs,15
+main main1,2
+
+./app/Main.hs,350
+module Main Main12,13
+addFrameHeader addFrameHeader58,59
+addFrameHeaderA addFrameHeaderA62,63
+addFrameHeaderC addFrameHeaderC67,68
+mainAPI mainAPI72,73
+main main104,105
+loadConfigAndRun loadConfigAndRun109,110
+preperDirStructure preperDirStructure122,123
+decodeB64 decodeB64131,132
+eitherB eitherB143,144
+infoWeb infoWeb149,150
+
+./src/AgaMonad.hs,1627
+data StepCmd StepCmd42,43
+data StepCmd = LLMReq LLMReq42,43
+data StepCmd = LLMReq Text | TCReq TCReq42,43
+data StepCmd = LLMReq Text | TCReq AgdaCode | UserReq UserReq42,43
+data AgaCmd AgaCmd44,45
+data AgaCmd = NextStep NextStep44,45
+data AgaCmd = NextStep StepCmd | AgaStopAgaStop44,45
+data AgaMsg AgaMsg46,47
+data AgaMsg = LLMRes LLMRes46,47
+data AgaMsg = LLMRes Text | TCRes TCRes46,47
+data AgaMsg = LLMRes Text | TCRes TCMsg | UserRes UserRes46,47
+data TCMsg TCMsg48,49
+data TCMsg = TCSucces TCSucces48,49
+data TCMsg = TCSucces | TCErr TCErr48,49
+data AgaTask AgaTask50,51
+  AgaTaskAgaTask51,52
+    { _firstStep _firstStep52,53
+      _taskStep _taskStep53,54
+      _initState _initState54,55
+data AgaState AgaState59,60
+data AgaState sT = AgaState AgaState59,60
+data AgaState sT = AgaState { _taskState _taskState59,60
+                            , _conversation _conversation60,61
+data AgaENV AgaENV63,64
+data AgaENV eT = AgaENV AgaENV63,64
+data AgaENV eT = AgaENV { _taskEnv _taskEnv63,64
+                        , _apiGptKey _apiGptKey64,65
+                        , _tcUrl _tcUrl65,66
+                        , _llmModel _llmModel66,67
+data  AgaOutput AgaOutput69,70
+data  AgaOutput oT = AgaOutput AgaOutput69,70
+data  AgaOutput oT = AgaOutput {_taskOutput _taskOutput69,70
+type  AgaMonad AgaMonad71,72
+data AgdaCode AgdaCode78,79
+data AgdaCode = AgdaSource AgdaSource78,79
+data AgdaCode = AgdaSource Text | AgdaFile AgdaFile78,79
+runAgaCmd runAgaCmd85,86
+runAgaTask runAgaTask106,107
+tryToCompileAPI tryToCompileAPI124,125
+dec dec144,145
+
+./src/CreateAgda.hs,629
+module CreateAgda CreateAgda7,8
+createFSM createFSM38,39
+createStateFSM createStateFSM53,54
+createTransitionFSM createTransitionFSM61,62
+toStringFromKM toStringFromKM72,73
+createAgdaFromBS createAgdaFromBS75,76
+createAndCompileAgda createAndCompileAgda83,84
+c c92,93
+saveAgda saveAgda100,101
+maybeAgda maybeAgda109,110
+foldInputMaybe foldInputMaybe122,123
+createUpdateMaybe createUpdateMaybe127,128
+cC cC142,143
+piAgda piAgda151,152
+createInputPi createInputPi171,172
+createUpdatePi createUpdatePi181,182
+compileProblem compileProblem195,196
+dec dec215,216
+ex1 ex1226,227
+exvm exvm276,277
+
+./src/AgaTypes.hs,3360
+module AgaTypes AgaTypes10,11
+data ChatCompletion ChatCompletion23,24
+data ChatCompletion = ChatCompletionChatCompletion23,24
+    { id id24,25
+    , object object25,26
+    , created created26,27
+    , model model27,28
+    , usage usage28,29
+    , choices choices29,30
+data Usage Usage32,33
+data Usage = UsageUsage32,33
+    { prompt_tokens prompt_tokens33,34
+    , completion_tokens completion_tokens34,35
+    , total_tokens total_tokens35,36
+data Choice Choice38,39
+data Choice = ChoiceChoice38,39
+    { message message39,40
+    , finish_reason finish_reason40,41
+    , index index41,42
+data Message Message44,45
+data Message = MessageMessage44,45
+    { role role45,46
+    , content content46,47
+instance FromJSON FromJSON ChatCompletion49,50
+    parseJSON parseJSON50,51
+instance FromJSON FromJSON Usage58,59
+    parseJSON parseJSON59,60
+instance FromJSON FromJSON Choice64,65
+    parseJSON parseJSON65,66
+instance FromJSON FromJSON Message70,71
+    parseJSON parseJSON71,72
+instance ToJSON ToJSON Message75,76
+  toJSON toJSON76,77
+data OperationMode OperationMode79,80
+data OperationMode =  PrettyMode PrettyMode79,80
+data OperationMode =  PrettyMode |  DebugModeDebugMode79,80
+data AGEnv AGEnv83,84
+data AGEnv = AGEnvAGEnv83,84
+    { apiKey apiKey84,85
+    , orgAgdaF orgAgdaF85,86
+    , dirName dirName86,87
+    , agdaFile agdaFile87,88
+    , taskDescription taskDescription88,89
+    , fullTask fullTask89,90
+    , operationMode operationMode90,91
+    , maxTurns maxTurns91,92
+    , fGptTemp fGptTemp92,93
+    , rGptTemp rGptTemp93,94
+    , gptModel gptModel94,95
+    , tc_url tc_url95,96
+    , tc_key tc_key96,97
+    , meta_l meta_l97,98
+data ResponseApi ResponseApi107,108
+data ResponseApi = ResponseApi{ ResponseApi{107,108
+data ResponseApi = ResponseApi{ output output107,108
+                              , status status108,109
+instance FromJSON FromJSON ResponseApi112,113
+    parseJSON parseJSON113,114
+data ProblemsInput ProblemsInput118,119
+data ProblemsInput = OneProblem OneProblem118,119
+data ProblemsInput = OneProblem | Dir Dir118,119
+data ProblemsInput = OneProblem | Dir | ListofProblem ListofProblem118,119
+data FromConfig FromConfig125,126
+data FromConfig = FromConfigFromConfig125,126
+  { gptApiKey gptApiKey126,127
+  , gpt_model gpt_model127,128
+  , typeCheckerURL typeCheckerURL128,129
+  , typeCheckerKEY typeCheckerKEY129,130
+  , problemsDir problemsDir130,131
+  , threadsNumbers threadsNumbers131,132
+instance FromJSON FromJSON FromConfig134,135
+  parseJSON parseJSON135,136
+data ConvPart ConvPart145,146
+data ConvPart = ConvPartConvPart145,146
+                  { gpt_input gpt_input146,147
+                  , gpt_res gpt_res147,148
+                  , pure_code_res pure_code_res148,149
+                  , current_agad_file current_agad_file149,150
+                  , agda_res agda_res150,151
+                  , promptL promptL151,152
+data Problem Problem154,155
+data Problem = Problem Problem154,155
+data Problem = Problem { agdaP agdaP154,155
+                       , taskP taskP155,156
+                       , metaP metaP156,157
+                       , nameP nameP157,158
+                       , fulltP fulltP158,159
+type AGMonad AGMonad162,163
+
+./src/AgaExtra.hs,485
+module AgaExtra AgaExtra7,8
+cPrint cPrint47,48
+check_promt check_promt55,56
+check_agda check_agda70,71
+check_config check_config81,82
+timestamp timestamp98,99
+timestamp2 timestamp2104,105
+trimPrompt trimPrompt111,112
+type  LString LString147,148
+dirInspection dirInspection149,150
+funcB funcB162,163
+decodeList decodeList174,175
+extractProblem extractProblem187,188
+findMetaD findMetaD197,198
+findMetaF findMetaF205,206
+splitProblem splitProblem215,216
+
+./src/LLMParser.hs,388
+module LLMParserLLMParser2,3
+data TrLLMResultTrLLMResult12,13
+  = TrLLMClarifications TrLLMClarifications13,14
+  | TrLLMAgdaSnippet TrLLMAgdaSnippet14,15
+data ResponseErrorResponseError18,19
+  = MultipleCodeBlocksMultipleCodeBlocks19,20
+  | NoRecognizedContentNoRecognizedContent20,21
+  | MalformedCodeBlockMalformedCodeBlock21,22
+parseLLMResponse parseLLMResponse34,35
+
+./src/AgaMain.hs,169
+module AgaMain AgaMain10,11
+loadAndR loadAndR44,45
+mainAG mainAG78,79
+conversation conversation89,90
+initInfo initInfo111,112
+intToWord16 intToWord16122,123
+
+./src/AgaMonad2.hs,1635
+module AgaMonad2AgaMonad212,13
+data StepCmdStepCmd54,55
+  = LLMReq LLMReq55,56
+  | TCReq TCReq56,57
+  | UserReq UserReq57,58
+data AgaCmdAgaCmd61,62
+  = NextStep NextStep62,63
+  | AgaStopAgaStop63,64
+data AgaMsgAgaMsg67,68
+  = LLMRes LLMRes68,69
+  | TCRes TCRes69,70
+  | UserRes UserRes70,71
+data TCMsgTCMsg74,75
+  = TCSuccesTCSucces75,76
+  | TCErr TCErr76,77
+data AgdaCodeAgdaCode80,81
+  = AgdaSource AgdaSource81,82
+  | AgdaFile AgdaFile82,83
+data AgaENV AgaENV86,87
+data AgaENV eT = AgaENVAgaENV86,87
+  { _taskEnv _taskEnv87,88
+  , _apiGptKey _apiGptKey88,89
+  , _tcUrl _tcUrl89,90
+  , _llmModel _llmModel90,91
+data AgaState AgaState95,96
+data AgaState sT = AgaStateAgaState95,96
+  { _taskState _taskState96,97
+  , _conversation _conversation97,98
+data Message Message101,102
+data Message = MessageMessage101,102
+  { role role102,103
+  , content content103,104
+data AgaOutput AgaOutput107,108
+data AgaOutput oT = AgaOutputAgaOutput107,108
+  { _taskOutput _taskOutput108,109
+data AgaTask AgaTask112,113
+  AgaTaskAgaTask113,114
+    { _firstStep _firstStep114,115
+    , _taskStep _taskStep116,117
+    , _initState _initState118,119
+type AgaMonad AgaMonad123,124
+class (Monad m) => AgaRuntime AgaRuntime149,150
+  handleLLMReq handleLLMReq150,151
+  handleTCReq handleTCReq151,152
+  handleUserReq handleUserReq152,153
+runAgaCmd runAgaCmd163,164
+runAgaTask runAgaTask196,197
+instance AgaRuntime AgaRuntime (AgaMonad eT oT sT)229,230
+  handleLLMReq handleLLMReq230,231
+  handleTCReq handleTCReq240,241
+  handleUserReq handleUserReq247,248
+
+./src/Utilities.hs,355
+module Utilities Utilities7,8
+plainCode plainCode45,46
+extractCode extractCode55,56
+rmSubS rmSubS69,70
+fConvInput fConvInput76,77
+replaceText replaceText83,84
+gptConv gptConv93,94
+trimPrompt trimPrompt109,110
+createGptRequest createGptRequest120,121
+genJsonReq genJsonReq134,135
+decodeRes decodeRes139,140
+metaAgda metaAgda145,146
+
+./src/AgdaApi.hs,82
+module AgdaApi AgdaApi7,8
+tryToCompileAPI tryToCompileAPI36,37
+dec dec56,57
+
+./src/AgaGpt.hs,545
+module AgaGpt AgaGpt7,8
+decodeRes decodeRes36,37
+genJsonReq genJsonReq41,42
+createGptRequest createGptRequest47,48
+gptConv gptConv62,63
+plainCode plainCode92,93
+extractCode extractCode101,102
+debugMode debugMode116,117
+createConvPart createConvPart297,298
+fConvInput fConvInput307,308
+rConvInput rConvInput315,316
+replaceText replaceText324,325
+replaceStringLoop replaceStringLoop332,333
+breakSubstring breakSubstring338,339
+  | str `L.isPrefixOf`L.isPrefixOf342,343
+rmSubS rmSubS348,349
+trimAns trimAns355,356
+
+./src/LLMParserTest.hs,676
+module LLMParserTest LLMParserTest2,3
+data ExpectedResultExpectedResult16,17
+  = ExpectClarifications ExpectClarifications17,18
+  | ExpectAgdaSnippet ExpectAgdaSnippet18,19
+  | ExpectError ExpectError19,20
+data TestCase TestCase26,27
+data TestCase = TestCaseTestCase26,27
+  { tcLabel tcLabel27,28
+  , tcInput tcInput28,29
+  , tcExpected tcExpected29,30
+data TestResult TestResult36,37
+data TestResult = TestPassed TestPassed36,37
+data TestResult = TestPassed | TestFailed TestFailed36,37
+runTestCase runTestCase39,40
+checkOutcome checkOutcome52,53
+testCases testCases89,90
+swap swap215,216
+main main217,218
+printResult printResult236,237
+
+./src/Types.hs,1486
+module Types Types5,6
+data Transition Transition18,19
+data Transition s  = Transition Transition18,19
+data Transition s  = Transition {target target18,19
+data State State20,21
+data State s t =  State State20,21
+data State s t =  State { transitions transitions20,21
+data FSM FSM23,24
+data FSM s t = FSM FSM23,24
+data FSM s t = FSM { states states23,24
+data FSMEnv FSMEnv26,27
+data FSMEnv = FSMEnv FSMEnv26,27
+data FSMEnv = FSMEnv { port port26,27
+                       gpt_key gpt_key27,28
+                       work_dir work_dir28,29
+                       tChecker_url tChecker_url29,30
+                       tChecker_key tChecker_key30,31
+data ReqGetAgda ReqGetAgda35,36
+data ReqGetAgda = ReqGetAgda ReqGetAgda35,36
+data ReqGetAgda = ReqGetAgda {schema schema35,36
+                    , mode mode36,37
+data Mode Mode39,40
+data Mode = Mb Mb39,40
+data Mode = Mb | Pi Pi39,40
+data ResponseTC ResponseTC41,42
+data ResponseTC = ResponseTC{ ResponseTC{41,42
+data ResponseTC = ResponseTC{ output output41,42
+                              , status status42,43
+data ReqCheckAgda ReqCheckAgda45,46
+data ReqCheckAgda = ReqCheckAgdaReqCheckAgda45,46
+                    {agdaCode agdaCode46,47
+                    , prompt1 prompt147,48
+                    , prompt2 prompt248,49
+                    , turns turns49,50
+                    , modelR modelR50,51
+                    , goalR goalR51,52
+metaEx metaEx55,56
+
+./src/TypeRefiner.hs,798
+module TypeRefiner TypeRefiner17,18
+data TrEnv TrEnv56,57
+  TrEnvTrEnv57,58
+  { _domainDef _domainDef58,59
+  , _domainPrompt _domainPrompt59,60
+  , _candidatePromptTemplate _candidatePromptTemplate60,61
+data TrState TrState63,64
+  TrStateTrState64,65
+    { _nlTypeDescription _nlTypeDescription65,66
+    , _nlClarifications _nlClarifications67,68
+data TrMsgTrMsg78,79
+  = ClrReq ClrReq79,80
+  | NlTypeReq NlTypeReq80,81
+  | SubmitNlTypeReq SubmitNlTypeReq81,82
+  | TypeCheckCandidate TypeCheckCandidate82,83
+  | UserAcpetanceReqUserAcpetanceReq83,84
+  | DoneDone84,85
+typeRefiner typeRefiner90,91
+fs fs101,102
+getCandidatePrompt getCandidatePrompt114,115
+agdaToNaturalLan agdaToNaturalLan121,122
+checkUserResponse checkUserResponse128,129
+ts ts135,136

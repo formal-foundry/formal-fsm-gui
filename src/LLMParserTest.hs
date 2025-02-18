@@ -170,7 +170,6 @@ testCases =
           , "  suc  : MyNat -> MyNat"
           , ""
           , "postulate something : MyNat -> Set"
-          , ""
           ]
       }
 
@@ -207,7 +206,6 @@ testCases =
       , tcExpected = ExpectAgdaSnippet $ T.unlines
           [ "postulate Strange : Set"
           , "  -- here's some random backtick: `` but not triple"
-          , ""
           ]
       }
   ]

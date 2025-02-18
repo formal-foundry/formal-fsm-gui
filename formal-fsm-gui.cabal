@@ -46,37 +46,38 @@ library
       src
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
   build-depends:
-      MissingH
-    , aeson
-    , ansi-terminal
-    , base >=4.7 && <5
-    , base64-bytestring
-    , bytestring
-    , cmdargs
-    , containers
-    , directory
-    , filepath
-    , haskeline
-    , http-client
-    , http-client-tls
-    , http-types
-    , lens
-    , mtl
-    , neat-interpolation
-    , process
-    , regex-posix
-    , regex-tdfa
-    , scheduler
-    , scotty
-    , split
-    , string-interpolate
-    , text
-    , time >=1.11.1.1
-    , transformers
-    , wai
-    , wai-cors
-    , wai-extra
-    , wai-middleware-static
+                    MissingH
+                , aeson
+                , ansi-terminal
+                , base >=4.7 && <5
+                , base64-bytestring
+                , bytestring
+                , cmdargs
+                , containers
+                , directory
+                , filepath
+                , haskeline
+                , http-client
+                , http-client-tls
+                , http-types
+                , lens
+                , mtl
+                , neat-interpolation
+                , process
+                , random >= 1.2.1.1
+                , regex-posix
+                , regex-tdfa
+                , scheduler
+                , scotty
+                , split
+                , string-interpolate
+                , text
+                , time >=1.11.1.1
+                , transformers
+                , wai
+                , wai-cors
+                , wai-extra
+                , wai-middleware-static
   default-language: Haskell2010
 
 executable formal-fsm-gui
@@ -89,38 +90,39 @@ executable formal-fsm-gui
       app
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      MissingH
-    , aeson
-    , ansi-terminal
-    , base >=4.7 && <5
-    , base64-bytestring
-    , bytestring
-    , cmdargs
-    , containers
-    , directory
-    , filepath
-    , formal-fsm-gui
-    , haskeline
-    , http-client
-    , http-client-tls
-    , http-types
-    , lens
-    , mtl
-    , neat-interpolation
-    , process
-    , regex-posix
-    , regex-tdfa
-    , scheduler
-    , scotty
-    , split
-    , string-interpolate
-    , text
-    , time >=1.11.1.1
-    , transformers
-    , wai
-    , wai-cors
-    , wai-extra
-    , wai-middleware-static
+                    MissingH
+                , aeson
+                , ansi-terminal
+                , base >=4.7 && <5
+                , base64-bytestring
+                , bytestring
+                , cmdargs
+                , containers
+                , directory
+                , filepath
+                , formal-fsm-gui
+                , haskeline
+                , http-client
+                , http-client-tls
+                , http-types
+                , lens
+                , mtl
+                , neat-interpolation
+                , process
+                , random >= 1.2.1.1
+                , regex-posix
+                , regex-tdfa
+                , scheduler
+                , scotty
+                , split
+                , string-interpolate
+                , text
+                , time >=1.11.1.1
+                , transformers
+                , wai
+                , wai-cors
+                , wai-extra
+                , wai-middleware-static
   default-language: Haskell2010
 
 test-suite fsm
@@ -134,36 +136,37 @@ test-suite fsm
       test
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      MissingH
-    , aeson
-    , ansi-terminal
-    , base >=4.7 && <5
-    , base64-bytestring
-    , bytestring
-    , cmdargs
-    , containers
-    , directory
-    , filepath
-    , formal-fsm-gui
-    , haskeline
-    , http-client
-    , http-client-tls
-    , http-types
-    , lens
-    , mtl
-    , neat-interpolation
-    , process
-    , regex-posix
-    , regex-tdfa
-    , scheduler
-    , scotty
-    , split
-    , string-interpolate
-    , text
-    , time >=1.11.1.1
-    , transformers
-    , wai
-    , wai-cors
-    , wai-extra
-    , wai-middleware-static
+                    MissingH
+                , aeson
+                , ansi-terminal
+                , base >=4.7 && <5
+                , base64-bytestring
+                , bytestring
+                , cmdargs
+                , containers
+                , directory
+                , filepath
+                , formal-fsm-gui
+                , haskeline
+                , http-client
+                , http-client-tls
+                , http-types
+                , lens
+                , mtl
+                , neat-interpolation
+                , process
+                , random >= 1.2.1.1
+                , regex-posix
+                , regex-tdfa
+                , scheduler
+                , scotty
+                , split
+                , string-interpolate
+                , text
+                , time >=1.11.1.1
+                , transformers
+                , wai
+                , wai-cors
+                , wai-extra
+                , wai-middleware-static
   default-language: Haskell2010

@@ -19,7 +19,7 @@ module TypeRefiner where
 
 import Utilities
 import qualified AgaTypes  as AT
-import AgaMonad
+import AgaMonad2
 
 -- NEW: Import your parser types and functions
 import LLMParser
@@ -88,10 +88,11 @@ data TrMsg
 -- Our TypeRefiner as an AgaTask
 --------------------------------------------------------------------------------
 
-typeRefiner :: AgaTask TrEnv Text TrState TrMsg
+typeRefiner :: AgaRuntime (m TrEnv Text TrState) =>
+                  AgaTask m TrEnv Text TrState TrMsg
 typeRefiner = AgaTask
   { _firstStep = fs
-  , _taskStep  = ts
+  , _taskStep  = undefined --ts
   , _initState = TrState "" []
   }
 
@@ -99,7 +100,7 @@ typeRefiner = AgaTask
 -- 2. The first step: ask the user for a type description
 --------------------------------------------------------------------------------
 
-fs :: AgaMonad TrEnv Text TrState (TrMsg, AgaCmd)
+fs :: AgaRuntime (m TrEnv Text TrState) => m TrEnv Text TrState (TrMsg, AgaCmd)
 fs = do
   -- We start by requesting a type from the user
   return
@@ -112,7 +113,9 @@ fs = do
 --------------------------------------------------------------------------------
 
 -- | Fill your candidate template with the user’s NL type and the domain prompt.
-getCandidatePrompt :: Text -> AgaMonad TrEnv Text TrState Text
+-- getCandidatePrompt :: Text -> AgaMonad TrEnv Text TrState Text
+
+-- getCandidatePrompt :: AgaRuntime (m TrEnv Text TrState) => Text -> m TrEnv Text TrState Text
 getCandidatePrompt nld = do
   tmpl <- view (taskEnv . candidatePromptTemplate)
   dp   <- view (taskEnv . domainPrompt)
@@ -133,7 +136,7 @@ checkUserResponse txt = T.toLower (T.strip txt) == "ok"
 -- 3. The main step function
 --------------------------------------------------------------------------------
 
-ts :: (TrMsg, AgaMsg) -> AgaMonad TrEnv Text TrState (TrMsg, AgaCmd)
+-- ts :: (TrMsg, AgaMsg) -> AgaMonad TrEnv Text TrState (TrMsg, AgaCmd)
 ts = \case
   ------------------------------------------------------------------------------
   -- A) NlTypeReq => user must specify a type in NL

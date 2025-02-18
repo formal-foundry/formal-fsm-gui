@@ -52,7 +52,8 @@ dependencies:
 - MissingH
 - scheduler
 - lens
-
+- random
+- yaml
 
 ghc-options:
 - -Wall

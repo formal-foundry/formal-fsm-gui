@@ -1,154 +1,224 @@
-
-{-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE QuasiQuotes #-}
-{-# OPTIONS_GHC -fno-warn-unused-matches #-}
-{-# OPTIONS_GHC -fno-warn-unused-imports #-}
-{-# OPTIONS_GHC -fno-warn-unused-binds #-}
-{-# OPTIONS_GHC -fno-warn-name-shadowing #-}
-{-# OPTIONS_GHC -fno-warn-missing-export-lists #-}
+{-# LANGUAGE DeriveGeneric     #-}
 
 module Main where
 
-import AgaTypes
-import Types
-import CreateAgda
-import AgaMain
-import AgaExtra
-import GHC.Generics
-import Data.Aeson
-import Data.Aeson.Text
+import           AgaMonad2
+import           Control.Lens          ((^.))
+import           Control.Monad.RWS     (runRWST)
+import           Control.Monad.Trans.RWS (RWST)
+import           Control.Monad.State   (modify)
+import           Control.Monad.Writer  (tell)
+import           Data.Maybe            (fromMaybe)
+import           Data.Text             (Text)
+import qualified Data.Text as T
+import qualified Data.Text.IO as TIO
+import           GHC.Generics          (Generic)
+import           System.Environment    (getArgs)
+import           System.Directory      (doesFileExist)
+import qualified Data.Yaml as Y
 
+--------------------------------------------------------------------------------
+-- 1. Configuration Data
+--------------------------------------------------------------------------------
 
-import Data.List
-import System.Console.CmdArgs
-import System.Environment (getArgs)
-import System.Process
-import System.Console.ANSI
-import System.Exit
-import System.FilePath (splitFileName)
-import System.Directory
+-- | We'll define a simple Config type that corresponds to the fields we need.
+data Config = Config
+  { cfgApiKey :: Text
+  , cfgTcUrl  :: Text
+  , cfgModel  :: Text
+  } deriving (Show, Generic)
 
+-- Make it an instance of FromJSON for easy YAML decoding.
+instance Y.FromJSON Config
 
-import qualified NeatInterpolation as NI(text)
-
-import Data.Text.Lazy
-import Control.Monad.IO.Class (liftIO)
-
-import Data.Text as T
-import Data.Text.Lazy as TL
-import Data.Text.Lazy.Encoding    as TL
-
-import Network.HTTP.Types.Status
-import Network.Wai.Parse
-import Web.Scotty
-import Network.Wai.Middleware.Static
-
-import Network.Wai
-import Network.Wai.Middleware.Cors
-
-import qualified Network.Wai.Parse as NWP
-import System.Environment
-import Data.Aeson
-import Data.ByteString.Base64.Lazy as B64
-import Control.Concurrent
-
-
-addFrameHeader :: Middleware
-addFrameHeader =
-  modifyResponse (mapResponseHeaders (("Access-Control-Allow-Origin", "*") :))
-
-addFrameHeaderA :: Middleware
-addFrameHeaderA =
- (modifyResponse (mapResponseHeaders (("Access-Control-Allow-Methods", "*") :)))
-
-
-addFrameHeaderC :: Middleware
-addFrameHeaderC =
-  modifyResponse (mapResponseHeaders (("Access-Control-Allow-Headers", "*") :))
-
-
-mainAPI :: FSMEnv -> IO ()
-mainAPI env =do 
-  scotty (port env) $ do
-    middleware addFrameHeader
-    middleware addFrameHeaderA
-    middleware addFrameHeaderC
-    middleware $ staticPolicy (noDots >-> addBase (work_dir env))
-    middleware $ staticPolicy (noDots >-> addBase ("./fsm-web"))
-    options (regex "/*")  $ text "Success"
-
-    get "/help" $  text  $ TL.fromStrict infoWeb
-
-    post "/checkAgda" $ do
-      body <- jsonData :: ActionM ReqCheckAgda
-      ts <- liftIO timestamp2
-      liftIO $ preperDirStructure ts env 
-      x <- liftIO $ forkIO $ loadAndR mainAG env (decodeB64 body) ts
-      text $ TL.pack ts
-
-    post "/getAgda" $ do
-      body  <- jsonData :: ActionM ReqGetAgda
-      let bs = case B64.decode  ( (TL.encodeUtf8 . TL.pack ) (schema body)) of
-            Right x  -> x
-            _ -> "empty"
-          mo = case (mode body) of
-               "pi" -> Pi
-               _ -> Mb
-
-      agda <-liftIO $ createAgdaFromBS bs mo
-      text $ TL.pack agda
-
-
-main :: IO ()
-main = loadConfigAndRun mainAPI
-
-
-
-loadConfigAndRun :: (FSMEnv  -> IO ()) -> IO ()
-loadConfigAndRun mainAPI =
-  do
-    home <- getEnv "HOME"
-    let path = home ++"/.fsm/config.json"
-    mbCfg <- decodeFileStrict path :: IO (Maybe FSMEnv)
-    case mbCfg of
-      Nothing ->
-                Prelude.putStrLn $ "Invalid JSON file format, check : " ++  path
-      Just cfg ->  mainAPI cfg
-
-
-
-preperDirStructure :: String -> FSMEnv  -> IO ()
-preperDirStructure ts e = do
-  setCurrentDirectory (work_dir e)
-  createDirectory ts
-  setCurrentDirectory $ (work_dir e)++"/"++ts
-  appendFile "general.txt" "Waiting for update..."
-  appendFile "code.txt" "Waiting for update...\n"
-  appendFile "all.txt" "Waiting for update...\n"
-
-decodeB64 :: ReqCheckAgda -> ReqCheckAgda
-decodeB64 r =
-  ReqCheckAgda
-  {agdaCode = eitherB (agdaCode r)
-  , prompt1 =  eitherB (prompt1 r)
-  , prompt2 =  eitherB (prompt2 r)
-  , turns = turns r
-  , modelR =  modelR r
-  , goalR = eitherB (goalR r)
+-- | Default fallback config, in case no file is provided
+--   and we don't get certain flags from cmdline.
+defaultConfig :: Config
+defaultConfig = Config
+  { cfgApiKey = "YOUR_DEFAULT_API_KEY"
+  , cfgTcUrl  = "http://localhost:8080"
+  , cfgModel  = "gpt-3.5-turbo"
   }
 
+--------------------------------------------------------------------------------
+-- 2. Loading the Config from File and/or Command Line
+--------------------------------------------------------------------------------
 
-eitherB :: String -> String
-eitherB s = case B64.decode  ( (TL.encodeUtf8 . TL.pack ) (s)) of
-              Right x  ->( TL.unpack . TL.decodeUtf8 ) x
-              _ -> "empty"
--- B64.decode  ( (TL.encodeUtf8 . TL.pack ) (schema body))
+-- | Load config from a YAML file, if it exists and is valid.
+loadConfigFile :: FilePath -> IO (Either String Config)
+loadConfigFile filePath = do
+  exists <- doesFileExist filePath
+  if not exists
+    then return (Left $ "Config file not found: " ++ filePath)
+    else do
+      eVal <- Y.decodeFileEither filePath
+      case eVal of
+        Left err   -> return (Left $ "YAML parse error: " ++ show err)
+        Right conf -> return (Right conf)
 
-infoWeb :: T.Text
-infoWeb =  [NI.text|
-EXAMPLE OF USAGE
-text 
-or HTML |]
+-- | Parse command-line arguments in a simplistic way:
+--   --config <path> --key <apiKey> --url <tcUrl> --model <modelName>
+parseArgs :: [String] -> IO (Maybe FilePath, Maybe Text, Maybe Text, Maybe Text)
+parseArgs [] = return (Nothing, Nothing, Nothing, Nothing)
+parseArgs ("--config":path:xs) = do
+  (mC, mK, mU, mM) <- parseArgs xs
+  return (Just path, mK, mU, mM)
+parseArgs ("--key":k:xs) = do
+  (mC, mK, mU, mM) <- parseArgs xs
+  return (mC, Just (T.pack k), mU, mM)
+parseArgs ("--url":u:xs) = do
+  (mC, mK, mU, mM) <- parseArgs xs
+  return (mC, mK, Just (T.pack u), mM)
+parseArgs ("--model":m:xs) = do
+  (mC, mK, mU, mM) <- parseArgs xs
+  return (mC, mK, mU, Just (T.pack m))
+parseArgs (_:xs) = parseArgs xs
+
+--------------------------------------------------------------------------------
+-- 3. Example Domain-Specific Environment, State, Output
+--------------------------------------------------------------------------------
+
+-- | For demonstration, let's define a custom environment extension.
+--   If you already have an `eT` type for your domain environment, use that instead.
+data MyEnvData = MyEnvData
+  { someEnvField :: Int
+    -- ^ Put any domain-specific environment fields here
+  } deriving (Show)
+
+-- | Similarly, define your domain-specific state.
+data MyStateData = MyStateData
+  { counter :: Int
+    -- ^ Example counter, or any custom state data
+  } deriving (Show)
+
+-- | The output we accumulate in the Writer. Adjust as needed.
+data MyOutputData = MyOutputData
+  { resultSummary :: Text
+  } deriving (Show)
+
+--------------------------------------------------------------------------------
+-- 4. Constructing the AgaENV and AgaState
+--------------------------------------------------------------------------------
+
+-- | Build the runtime `AgaENV eT` using the loaded config and your own domain data.
+mkAgaEnv :: Config -> AgaENV MyEnvData
+mkAgaEnv cfg = AgaENV
+  { _taskEnv   = MyEnvData { someEnvField = 42 }
+  , _apiGptKey = cfgApiKey cfg
+  , _tcUrl     = cfgTcUrl cfg
+  , _llmModel  = cfgModel cfg
+  }
+
+-- | Initial domain state. In a real app, load or compute it as needed.
+initMyState :: MyStateData
+initMyState = MyStateData
+  { counter = 0
+  }
+
+-- | Start with an empty conversation or pre-populate if needed.
+initAgaState :: MyStateData -> AgaState MyStateData
+initAgaState s =
+  AgaState
+    { _taskState    = s
+    , _conversation = []  -- no prior messages
+    }
+
+--------------------------------------------------------------------------------
+-- 5. Define a Sample Task
+--------------------------------------------------------------------------------
+
+-- | We'll define a model type used internally in the task's steps.
+data MyModel = MyModel
+  { someField :: Text
+  } deriving (Show)
+
+-- | A trivial example task to show how you might tie it all together.
+myTask :: AgaTask (AgaMonad MyEnvData MyOutputData MyStateData) 
+                 MyEnvData  -- eT
+                 MyOutputData -- oT
+                 MyStateData  -- sT
+                 MyModel      -- mT
+myTask = AgaTask
+  { _firstStep = do
+      -- Possibly do some initialization logic
+      let modelVal = MyModel "Initial model content"
+      -- Output something to the writer
+      tell [AgaOutput (MyOutputData "First step started.")]
+      -- Next, specify the next command to the runtime (we'll do an LLM request).
+      return (modelVal, NextStep (LLMReq "Hello, LLM!"))
+
+  , _taskStep = \(modelVal, agaMsg) -> do
+      case agaMsg of
+        LLMRes txt -> do
+          -- We got a response from the LLM
+          tell [AgaOutput (MyOutputData ("LLM said: " <> txt))]
+          -- Update the state or do domain logic
+          modify (\st -> st { _taskState = (st ^. taskState) { counter = counter (st ^. taskState) + 1 } })
+          -- Perhaps ask for user input next
+          return (modelVal { someField = "Updated from LLMRes" }, NextStep (UserReq "Please provide input."))
+
+        UserRes userTxt -> do
+          tell [AgaOutput (MyOutputData ("User typed: " <> userTxt))]
+          -- Maybe we do another step or we can stop
+          -- Let's do a type-check next
+          return (modelVal, NextStep (TCReq (AgdaSource "module Demo where\npostulate A : Set")))
+
+        TCRes tcMsg -> do
+          case tcMsg of
+            TCSucces     -> tell [AgaOutput (MyOutputData "Agda check succeeded.")]
+            TCErr errTxt -> tell [AgaOutput (MyOutputData ("Agda check error: " <> errTxt))]
+          -- Now let's stop
+          return (modelVal, AgaStop)
+  , _initState = initMyState
+  }
+
+--------------------------------------------------------------------------------
+-- 6. Orchestrate it all in `main`
+--------------------------------------------------------------------------------
+
+main :: IO ()
+main = do
+  -- 6.1. Parse command-line arguments
+  args <- getArgs
+  (mConfigFile, mApiKey, mTcUrl, mModel) <- parseArgs args
+
+  -- 6.2. Load config from file (if requested) or use default
+  baseConf <- case mConfigFile of
+                Just fp -> do
+                  eLoaded <- loadConfigFile fp
+                  case eLoaded of
+                    Left err  -> do
+                      putStrLn $ "Warning: " ++ err
+                      return defaultConfig
+                    Right c   -> return c
+                Nothing -> return defaultConfig
+
+  -- 6.3. Merge config with any overriding command-line flags
+  let finalConf = baseConf
+        { cfgApiKey = fromMaybe (cfgApiKey baseConf) mApiKey
+        , cfgTcUrl  = fromMaybe (cfgTcUrl  baseConf) mTcUrl
+        , cfgModel  = fromMaybe (cfgModel  baseConf) mModel
+        }
+
+  -- 6.4. Create the environment and initial AgaState
+  let env     = mkAgaEnv finalConf
+  let agaSt   = initAgaState initMyState
+
+  -- 6.5. Run the AgaTask in the AgaMonad
+  putStrLn "Running AgaTask..."
+  (res, finalState, writerLog) <- runRWST (runAgaTask myTask) env agaSt
+
+  -- 6.6. Handle the results
+  putStrLn "Task completed."
+  putStrLn "======================="
+  putStrLn "Collected outputs from the writer (the `[oT]` from runAgaTask itself):"
+  mapM_ print res
+
+  putStrLn "\nComplete log stored by the Writer (the `[AgaOutput oT]`):"
+  mapM_ print writerLog
+
+  putStrLn "\nFinal state (including conversation, etc.):"
+  print finalState
+
+  putStrLn "\nDone."
